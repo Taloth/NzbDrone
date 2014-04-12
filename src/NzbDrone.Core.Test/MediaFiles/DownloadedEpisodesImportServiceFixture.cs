@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using FizzWare.NBuilder;
 using Moq;
 using NUnit.Framework;
@@ -28,8 +29,8 @@ namespace NzbDrone.Core.Test.MediaFiles
         [SetUp]
         public void Setup()
         {
-            Mocker.GetMock<IDiskScanService>().Setup(c => c.GetVideoFiles(It.IsAny<string>(), It.IsAny<bool>()))
-                  .Returns(_videoFiles);
+            Mocker.GetMock<IDiskScanService>().Setup(c => c.GetFileSets(It.IsAny<string>(), It.IsAny<bool>()))
+                  .Returns(_videoFiles.Select(c => new FileSet(c)).ToArray());
 
             Mocker.GetMock<IDiskProvider>().Setup(c => c.GetDirectories(It.IsAny<string>()))
                   .Returns(_subFolders);
@@ -107,8 +108,8 @@ namespace NzbDrone.Core.Test.MediaFiles
                   .Returns(true);
 
             Mocker.GetMock<IDiskScanService>()
-                  .Setup(c => c.GetVideoFiles(It.IsAny<string>(), It.IsAny<bool>()))
-                  .Returns(new string[0]);
+                  .Setup(c => c.GetFileSets(It.IsAny<string>(), It.IsAny<bool>()))
+                  .Returns(new FileSet[0]);
 
             Subject.Execute(new DownloadedEpisodesScanCommand());
 

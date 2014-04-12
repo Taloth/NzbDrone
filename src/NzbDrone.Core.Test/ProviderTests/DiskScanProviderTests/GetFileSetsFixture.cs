@@ -11,7 +11,7 @@ using NzbDrone.Core.Test.Framework;
 namespace NzbDrone.Core.Test.ProviderTests.DiskScanProviderTests
 {
     
-    public class GetVideoFilesFixture : CoreTest<DiskScanService>
+    public class GetFileSetsFixture : CoreTest<DiskScanService>
     {
         private string[] _files;
 
@@ -38,7 +38,7 @@ namespace NzbDrone.Core.Test.ProviderTests.DiskScanProviderTests
         {
             var path = @"C:\Test\";
 
-            Subject.GetVideoFiles(path);
+            Subject.GetFileSets(path);
 
             Mocker.GetMock<IDiskProvider>().Verify(s => s.GetFiles(path, SearchOption.AllDirectories), Times.Once());
             Mocker.GetMock<IDiskProvider>().Verify(s => s.GetFiles(path, SearchOption.TopDirectoryOnly), Times.Never());
@@ -49,7 +49,7 @@ namespace NzbDrone.Core.Test.ProviderTests.DiskScanProviderTests
         {
             var path = @"C:\Test\";
 
-            Subject.GetVideoFiles(path, true);
+            Subject.GetFileSets(path, true);
 
             Mocker.GetMock<IDiskProvider>().Verify(s => s.GetFiles(path, SearchOption.AllDirectories), Times.Once());
             Mocker.GetMock<IDiskProvider>().Verify(s => s.GetFiles(path, SearchOption.TopDirectoryOnly), Times.Never());
@@ -60,7 +60,7 @@ namespace NzbDrone.Core.Test.ProviderTests.DiskScanProviderTests
         {
             var path = @"C:\Test\";
 
-            Subject.GetVideoFiles(path, false);
+            Subject.GetFileSets(path, false);
 
             Mocker.GetMock<IDiskProvider>().Verify(s => s.GetFiles(path, SearchOption.AllDirectories), Times.Never());
             Mocker.GetMock<IDiskProvider>().Verify(s => s.GetFiles(path, SearchOption.TopDirectoryOnly), Times.Once());
@@ -70,8 +70,8 @@ namespace NzbDrone.Core.Test.ProviderTests.DiskScanProviderTests
         public void should_return_video_files_only()
         {
             var path = @"C:\Test\";
-            var test = Subject.GetVideoFiles(path);
-            Subject.GetVideoFiles(path).Should().HaveCount(4);
+            var test = Subject.GetFileSets(path);
+            Subject.GetFileSets(path).Should().HaveCount(4);
         }
     }
 }

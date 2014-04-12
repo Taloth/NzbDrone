@@ -14,6 +14,7 @@ using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Parser;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Tv;
+using NzbDrone.Core.Parser.Model;
 
 namespace NzbDrone.Core.MediaFiles
 {
@@ -72,60 +73,17 @@ namespace NzbDrone.Core.MediaFiles
                 ProcessFolder(subFolder);
             }
 
-            foreach (var videoFile in _diskScanService.GetVideoFiles(downloadedEpisodesFolder, false))
+            foreach (var fileSet in _diskScanService.GetFileSets(downloadedEpisodesFolder, false))
             {
                 try
                 {
-                    ProcessVideoFile(videoFile);
+                    ProcessRootFileSet(fileSet);
                 }
                 catch (Exception ex)
                 {
-                    _logger.ErrorException("An error has occurred while importing video file" + videoFile, ex);
+                    _logger.ErrorException("An error has occurred while importing fileSet " + fileSet.VideoFile, ex);
                 }
             }
-        }
-
-        private List<ImportDecision> ProcessFolder(DirectoryInfo directoryInfo)
-        {
-            var cleanedUpName = GetCleanedUpFolderName(directoryInfo.Name);
-            var series = _parsingService.GetSeries(cleanedUpName);
-            var quality = QualityParser.ParseQuality(cleanedUpName);
-            _logger.Debug("{0} folder quality: {1}", cleanedUpName, quality);
-
-            if (series == null)
-            {
-                _logger.Debug("Unknown Series {0}", cleanedUpName);
-                return new List<ImportDecision>();
-            }
-
-            var videoFiles = _diskScanService.GetVideoFiles(directoryInfo.FullName);
-
-            return ProcessFiles(series, quality, videoFiles);
-        }
-
-        private void ProcessVideoFile(string videoFile)
-        {
-            var series = _parsingService.GetSeries(Path.GetFileNameWithoutExtension(videoFile));
-
-            if (series == null)
-            {
-                _logger.Debug("Unknown Series for file: {0}", videoFile);
-                return;
-            }
-
-            if (_diskProvider.IsFileLocked(videoFile))
-            {
-                _logger.Debug("[{0}] is currently locked by another process, skipping", videoFile);
-                return;
-            }
-
-            ProcessFiles(series, null, videoFile);
-        }
-
-        private List<ImportDecision> ProcessFiles(Series series, QualityModel quality, params string[] videoFiles)
-        {
-            var decisions = _importDecisionMaker.GetImportDecisions(videoFiles.ToList(), series, true, quality);
-            return _importApprovedEpisodes.Import(decisions, true);
         }
 
         private void ProcessFolder(string path)
@@ -134,16 +92,28 @@ namespace NzbDrone.Core.MediaFiles
 
             try
             {
+                var directoryInfo = new DirectoryInfo(path);
+
+                foreach (var workingFolder in _configService.DownloadClientWorkingFolders.Split('|'))
+                {
+                    if (directoryInfo.Name.StartsWith(workingFolder))
+                    {
+                        _logger.Trace("{0} is still being unpacked", directoryInfo.FullName);
+                        return;
+                    }
+                }
+
                 if (_seriesService.SeriesPathExists(path))
                 {
                     _logger.Warn("Unable to process folder that contains sorted TV Shows");
                     return;
                 }
 
-                var directoryFolderInfo = new DirectoryInfo(path);
-                var importedFiles = ProcessFolder(directoryFolderInfo);
-                
-                if (importedFiles.Any() && ShouldDeleteFolder(directoryFolderInfo))
+                var fileSets = _diskScanService.GetFileSets(directoryInfo.FullName, true);
+
+                var importedFiles = ProcessFiles(fileSets, directoryInfo.Name);
+
+                if (importedFiles.Any() && ShouldDeleteFolder(directoryInfo))
                 {
                     _logger.Debug("Deleting folder after importing valid files");
                     _diskProvider.DeleteFolder(path, true);
@@ -155,37 +125,76 @@ namespace NzbDrone.Core.MediaFiles
             }
         }
 
-        private string GetCleanedUpFolderName(string folder)
+        private void ProcessRootFileSet(FileSet fileSet)
         {
-            folder = folder.Replace("_UNPACK_", "")
-                           .Replace("_FAILED_", "");
+            if (_diskProvider.IsFileLocked(fileSet.VideoFile))
+            {
+                _logger.Debug("[{0}] is currently locked by another process, skipping", fileSet.VideoFile);
+                return;
+            }
 
-            return folder;
+            ProcessFiles(new [] { fileSet });
+        }
+
+        private List<ImportDecision> ProcessFiles(IEnumerable<FileSet> fileSets, string directoryName = null)
+        {
+            // TODO: This belongs in the ImportDecisionMaker or ParsingService.
+
+            Series directorySeries = null;
+            ParsedEpisodeInfo directoryEpisodeInfo = null;
+            Series fileSeries = null;
+            
+            if (directoryName != null)
+            {
+                directorySeries = _parsingService.GetSeries(directoryName);
+                directoryEpisodeInfo = Parser.Parser.ParsePath(directoryName);
+                
+                if (directoryEpisodeInfo != null)
+                _logger.Debug("{0} folder quality: {1}", directoryName, directoryEpisodeInfo.Quality);
+            }
+            
+            foreach (var fileSet in fileSets)
+            {
+                fileSeries = _parsingService.GetSeries(Path.GetFileName(fileSet.VideoFile));
+
+                if (fileSeries != null)
+                    break;
+            }
+
+            var series = fileSeries ?? directorySeries;
+            
+            if (series == null)
+            {
+                _logger.Debug("Unknown Series: {0}", fileSets.First().VideoFile);
+                return new List<ImportDecision>();
+            }
+
+            var decisions = _importDecisionMaker.GetImportDecisions(fileSets.Select(c => c.VideoFile).ToList(), series, true, directoryEpisodeInfo.Quality);
+            return _importApprovedEpisodes.Import(decisions, true);
         }
 
         private bool ShouldDeleteFolder(DirectoryInfo directoryInfo)
         {
-            var videoFiles = _diskScanService.GetVideoFiles(directoryInfo.FullName);
-            var cleanedUpName = GetCleanedUpFolderName(directoryInfo.Name);
+            var fileSets = _diskScanService.GetFileSets(directoryInfo.FullName);
+            var cleanedUpName = directoryInfo.Name;
             var series = _parsingService.GetSeries(cleanedUpName);
 
-            foreach (var videoFile in videoFiles)
+            foreach (var fileSet in fileSets)
             {
-                var episodeParseResult = Parser.Parser.ParseTitle(Path.GetFileName(videoFile));
+                var episodeParseResult = Parser.Parser.ParseTitle(Path.GetFileName(fileSet.VideoFile));
 
                 if (episodeParseResult == null)
                 {
-                    _logger.Warn("Unable to parse file on import: [{0}]", videoFile);
+                    _logger.Warn("Unable to parse file on import: [{0}]", fileSet.VideoFile);
                     return false;
                 }
 
-                var size = _diskProvider.GetFileSize(videoFile);
-                var quality = QualityParser.ParseQuality(videoFile);
+                var size = _diskProvider.GetFileSize(fileSet.VideoFile);
+                var quality = QualityParser.ParseQuality(fileSet.VideoFile);
 
-                if (!_sampleService.IsSample(series, quality, videoFile, size,
-                    episodeParseResult.SeasonNumber))
+                if (!_sampleService.IsSample(series, quality, fileSet.VideoFile, size, episodeParseResult.SeasonNumber))
                 {
-                    _logger.Warn("Non-sample file detected: [{0}]", videoFile);
+                    _logger.Warn("Non-sample file detected: [{0}]", fileSet.VideoFile);
                     return false;
                 }
             }
@@ -199,7 +208,6 @@ namespace NzbDrone.Core.MediaFiles
             {
                 ProcessDownloadedEpisodesFolder();
             }
-
             else
             {
                 ProcessFolder(message.Path);

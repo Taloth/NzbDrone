@@ -12,13 +12,15 @@ using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Tv;
 using NzbDrone.Core.Tv.Events;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace NzbDrone.Core.MediaFiles
 {
     public interface IDiskScanService
     {
         void Scan(Series series);
-        string[] GetVideoFiles(string path, bool allDirectories = true);
+        IEnumerable<FileSet> GetFileSets(string path, bool allDirectories = true);
     }
 
     public class DiskScanService :
@@ -76,12 +78,12 @@ namespace NzbDrone.Core.MediaFiles
             }
 
             var videoFilesStopwatch = Stopwatch.StartNew();
-            var mediaFileList = GetVideoFiles(series.Path).ToList();
+            var mediaFileList = GetFileSets(series.Path).ToList();
             videoFilesStopwatch.Stop();
             _logger.Trace("Finished getting episode files for: {0} [{1}]", series, videoFilesStopwatch.Elapsed);
 
             var decisionsStopwatch = Stopwatch.StartNew();
-            var decisions = _importDecisionMaker.GetImportDecisions(mediaFileList, series, false);
+            var decisions = _importDecisionMaker.GetImportDecisions(mediaFileList.Select(v => v.VideoFile).ToList(), series, false);
             decisionsStopwatch.Stop();
             _logger.Trace("Import decisions complete for: {0} [{1}]", series, decisionsStopwatch.Elapsed);
 
@@ -91,17 +93,41 @@ namespace NzbDrone.Core.MediaFiles
             _eventAggregator.PublishEvent(new SeriesScannedEvent(series));
         }
 
-        public string[] GetVideoFiles(string path, bool allDirectories = true)
+        public IEnumerable<FileSet> GetFileSets(string path, bool allDirectories = true)
         {
-            _logger.Debug("Scanning '{0}' for video files", path);
+            _logger.Debug("Scanning '{0}' for media files", path);
 
             var searchOption = allDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var filesOnDisk = _diskProvider.GetFiles(path, searchOption);
 
-            var mediaFileList = filesOnDisk.Where(c => MediaFileExtensions.Extensions.Contains(Path.GetExtension(c).ToLower())).ToList();
+            var mediaFileList = filesOnDisk
+                .Where(c => MediaFileExtensions.Extensions.Contains(Path.GetExtension(c).ToLower()))
+                .OrderByDescending(c => c.Length)
+                .ToList();
 
-            _logger.Debug("{0} video files were found in {1}", mediaFileList.Count, path);
-            return mediaFileList.ToArray();
+            _logger.Debug("{0} media files were found in {1}", mediaFileList.Count, path);
+
+            var remainingFileList = filesOnDisk.Except(mediaFileList).ToList();
+
+            foreach (var mediaFile in mediaFileList)
+            {
+                var fileSet = new FileSet(mediaFile);
+                var nameWithoutExtension = Path.Combine(Path.GetDirectoryName(mediaFile), Path.GetFileNameWithoutExtension(mediaFile)) + ".";
+
+                for (int i = 0; i < remainingFileList.Count; i++)
+                {
+                    if (remainingFileList[i].StartsWith(nameWithoutExtension, true, CultureInfo.InvariantCulture))
+                    {
+                        fileSet.OtherFiles.Add(remainingFileList[i]);
+                        remainingFileList.RemoveAt(i--);
+                    }
+                }
+
+                yield return fileSet;
+            }
+
+            if (remainingFileList.Count != 0)
+                _logger.Debug("{0} files in {1} could not be associated with a media file and will be ignored", remainingFileList.Count, path);
         }
 
         public void Handle(SeriesUpdatedEvent message)
