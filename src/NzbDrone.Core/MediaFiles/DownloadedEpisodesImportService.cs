@@ -173,7 +173,9 @@ namespace NzbDrone.Core.MediaFiles
 
             var decisions = _importDecisionMaker.GetImportDecisions(fileSets.ToList(), series, true, directoryQuality);
 
-            return _importApprovedEpisodes.Import(decisions, true);
+            // TODO: Disable the actual import to prevent failures.
+            //return _importApprovedEpisodes.Import(decisions, true);
+            return new List<ImportDecision>();
         }
 
         private bool ShouldDeleteFolder(DirectoryInfo directoryInfo)
