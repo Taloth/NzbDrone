@@ -33,7 +33,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Specifications
 
             return !_sampleService.IsSample(localEpisode.Series,
                                             localEpisode.Quality,
-                                            localEpisode.Path,
+                                            localEpisode.FileSet.VideoFile,
                                             localEpisode.Size,
                                             localEpisode.SeasonNumber);
         }

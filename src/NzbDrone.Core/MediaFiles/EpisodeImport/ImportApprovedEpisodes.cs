@@ -69,8 +69,8 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
                     var episodeFile = new EpisodeFile();
                     episodeFile.DateAdded = DateTime.UtcNow;
                     episodeFile.SeriesId = localEpisode.Series.Id;
-                    episodeFile.Path = localEpisode.Path.CleanFilePath();
-                    episodeFile.Size = _diskProvider.GetFileSize(localEpisode.Path);
+                    episodeFile.Path = localEpisode.FileSet.VideoFile.CleanFilePath();
+                    episodeFile.Size = _diskProvider.GetFileSize(localEpisode.FileSet.VideoFile);
                     episodeFile.Quality = localEpisode.Quality;
                     episodeFile.SeasonNumber = localEpisode.SeasonNumber;
                     episodeFile.Episodes = localEpisode.Episodes;
@@ -78,7 +78,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
 
                     if (newDownload)
                     {
-                        episodeFile.SceneName = Path.GetFileNameWithoutExtension(localEpisode.Path.CleanFilePath());
+                        episodeFile.SceneName = Path.GetFileNameWithoutExtension(localEpisode.FileSet.VideoFile.CleanFilePath());
                         var moveResult = _episodeFileUpgrader.UpgradeEpisodeFile(episodeFile, localEpisode);
                         oldFiles = moveResult.OldFiles;
                     }

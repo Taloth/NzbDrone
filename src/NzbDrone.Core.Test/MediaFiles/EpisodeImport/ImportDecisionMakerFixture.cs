@@ -73,7 +73,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
             { 
                 Series = _series,
                 Quality = _quality,
-                Path = @"C:\Test\Unsorted\The.Office.S03E115.DVDRip.XviD-OSiTV.avi"
+                FileSet = new Core.MediaFiles.FileSet(@"C:\Test\Unsorted\The.Office.S03E115.DVDRip.XviD-OSiTV.avi")
             };
 
             Mocker.GetMock<IParsingService>()

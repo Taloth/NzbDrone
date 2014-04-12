@@ -11,6 +11,7 @@ using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Test.Framework;
 using NzbDrone.Core.Tv;
 using NzbDrone.Test.Common;
+using NzbDrone.Core.MediaFiles;
 
 namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport.Specifications
 {
@@ -28,7 +29,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport.Specifications
 
             _localEpisode = new LocalEpisode
             {
-                Path = @"C:\Test\Unsorted TV\30.rock\30.rock.s01e01.avi".AsOsAgnostic(),
+                FileSet = new FileSet(@"C:\Test\Unsorted TV\30.rock\30.rock.s01e01.avi".AsOsAgnostic()),
                 Size = 100,
                 Series = Builder<Series>.CreateNew().Build()
             };
@@ -36,7 +37,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport.Specifications
 
         private void GivenInWorkingFolder()
         {
-            _localEpisode.Path = @"C:\Test\Unsorted TV\_UNPACK_30.rock\30.rock.s01e01.avi".AsOsAgnostic();
+            _localEpisode.FileSet = new FileSet(@"C:\Test\Unsorted TV\_UNPACK_30.rock\30.rock.s01e01.avi".AsOsAgnostic());
         }
 
         private void GivenLastWriteTimeUtc(DateTime time)

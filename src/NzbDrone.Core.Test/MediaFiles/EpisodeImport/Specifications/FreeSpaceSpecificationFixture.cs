@@ -41,7 +41,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport.Specifications
 
             _localEpisode = new LocalEpisode
                                 {
-                                    Path = @"C:\Test\Unsorted\30 Rock\30.rock.s01e01.avi".AsOsAgnostic(),
+                                    FileSet = new Core.MediaFiles.FileSet(@"C:\Test\Unsorted\30 Rock\30.rock.s01e01.avi".AsOsAgnostic()),
                                     Episodes = episodes,
                                     Series = _series
                                 };

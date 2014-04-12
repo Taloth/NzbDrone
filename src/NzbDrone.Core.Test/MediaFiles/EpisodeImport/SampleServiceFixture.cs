@@ -34,7 +34,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
 
             _localEpisode = new LocalEpisode
                                 {
-                                    Path = @"C:\Test\30 Rock\30.rock.s01e01.avi",
+                                    FileSet = new Core.MediaFiles.FileSet(@"C:\Test\30 Rock\30.rock.s01e01.avi"),
                                     Episodes = episodes,
                                     Series = _series,
                                     Quality = new QualityModel(Quality.HDTV720p)
@@ -63,7 +63,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
         [Test]
         public void should_return_false_for_flv()
         {
-            _localEpisode.Path = @"C:\Test\some.show.s01e01.flv";
+            _localEpisode.FileSet = new Core.MediaFiles.FileSet(@"C:\Test\some.show.s01e01.flv");
 
             ShouldBeFalse();
 
@@ -78,7 +78,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
 
             Subject.IsSample(_localEpisode.Series,
                              _localEpisode.Quality,
-                             _localEpisode.Path,
+                             _localEpisode.FileSet.VideoFile,
                              _localEpisode.Size,
                              _localEpisode.SeasonNumber);
 
@@ -136,7 +136,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
         {
             Subject.IsSample(_localEpisode.Series,
                                          _localEpisode.Quality,
-                                         _localEpisode.Path,
+                                         _localEpisode.FileSet.VideoFile,
                                          _localEpisode.Size,
                                          _localEpisode.SeasonNumber).Should().BeTrue();
         }
@@ -145,7 +145,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
         {
             Subject.IsSample(_localEpisode.Series,
                              _localEpisode.Quality,
-                             _localEpisode.Path,
+                             _localEpisode.FileSet.VideoFile,
                              _localEpisode.Size,
                              _localEpisode.SeasonNumber).Should().BeFalse();
         }

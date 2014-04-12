@@ -76,7 +76,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
                     else
                     {
                         parsedEpisode = new LocalEpisode();
-                        parsedEpisode.Path = file;
+                        parsedEpisode.FileSet = new FileSet(file);
 
                         decision = new ImportDecision(parsedEpisode, "Unable to parse file");
                     }
@@ -120,7 +120,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
             {
                 //e.Data.Add("report", remoteEpisode.Report.ToJson());
                 //e.Data.Add("parsed", remoteEpisode.ParsedEpisodeInfo.ToJson());
-                _logger.ErrorException("Couldn't evaluate decision on " + localEpisode.Path, e);
+                _logger.ErrorException("Couldn't evaluate decision on " + localEpisode.FileSet.VideoFile, e);
                 return string.Format("{0}: {1}", spec.GetType().Name, e.Message);
             }
 

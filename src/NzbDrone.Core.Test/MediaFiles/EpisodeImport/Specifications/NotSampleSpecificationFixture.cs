@@ -34,7 +34,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport.Specifications
 
             _localEpisode = new LocalEpisode
                                 {
-                                    Path = @"C:\Test\30 Rock\30.rock.s01e01.avi",
+                                    FileSet = new Core.MediaFiles.FileSet(@"C:\Test\30 Rock\30.rock.s01e01.avi"),
                                     Episodes = episodes,
                                     Series = _series,
                                     Quality = new QualityModel(Quality.HDTV720p)

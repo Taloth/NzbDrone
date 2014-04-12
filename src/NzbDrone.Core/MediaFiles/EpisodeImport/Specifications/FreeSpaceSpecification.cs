@@ -59,7 +59,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Specifications
             }
             catch (Exception ex)
             {
-                _logger.ErrorException("Unable to check free disk space while importing: " + localEpisode.Path, ex);
+                _logger.ErrorException("Unable to check free disk space while importing: " + localEpisode.FileSet.VideoFile, ex);
             }
 
             return true;

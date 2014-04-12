@@ -71,10 +71,10 @@ namespace NzbDrone.Core.Parser
 
             return new LocalEpisode
             {
+                FileSet = new MediaFiles.FileSet(filename),
                 Series = series,
                 Quality = parsedEpisodeInfo.Quality,
                 Episodes = episodes,
-                Path = filename,
                 ParsedEpisodeInfo = parsedEpisodeInfo,
                 ExistingFile = DiskProviderBase.IsParent(series.Path, filename)
             };

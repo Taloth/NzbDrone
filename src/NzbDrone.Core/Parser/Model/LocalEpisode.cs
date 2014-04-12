@@ -3,12 +3,13 @@ using System.Linq;
 using System.Collections.Generic;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Tv;
+using NzbDrone.Core.MediaFiles;
 
 namespace NzbDrone.Core.Parser.Model
 {
     public class LocalEpisode
     {
-        public String Path { get; set; }
+        public FileSet FileSet { get; set; }
         public Int64 Size { get; set; }
         public ParsedEpisodeInfo ParsedEpisodeInfo { get; set; }
         public Series Series { get; set; }
@@ -26,7 +27,7 @@ namespace NzbDrone.Core.Parser.Model
         
         public override string ToString()
         {
-            return Path;
+            return FileSet.VideoFile;
         }
     }
 }

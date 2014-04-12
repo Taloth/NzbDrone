@@ -28,23 +28,23 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Specifications
         {
             if (localEpisode.ExistingFile)
             {
-                _logger.Debug("{0} is in series folder, unpacking check", localEpisode.Path);
+                _logger.Debug("{0} is in series folder, unpacking check", localEpisode.FileSet.VideoFile);
                 return true;
             }
 
             foreach (var workingFolder in _configService.DownloadClientWorkingFolders.Split('|'))
             {
-                if (Directory.GetParent(localEpisode.Path).Name.StartsWith(workingFolder))
+                if (Directory.GetParent(localEpisode.FileSet.VideoFile).Name.StartsWith(workingFolder))
                 {
                     if (OsInfo.IsMono)
                     {
-                        _logger.Debug("{0} is still being unpacked", localEpisode.Path);
+                        _logger.Debug("{0} is still being unpacked", localEpisode.FileSet.VideoFile);
                         return false;
                     }
 
-                    if (_diskProvider.FileGetLastWriteUtc(localEpisode.Path) > DateTime.UtcNow.AddMinutes(-5))
+                    if (_diskProvider.FileGetLastWriteUtc(localEpisode.FileSet.VideoFile) > DateTime.UtcNow.AddMinutes(-5))
                     {
-                        _logger.Debug("{0} appears to be unpacking still", localEpisode.Path);
+                        _logger.Debug("{0} appears to be unpacking still", localEpisode.FileSet.VideoFile);
                         return false;
                     }
                 }
