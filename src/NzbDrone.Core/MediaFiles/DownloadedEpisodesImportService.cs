@@ -141,18 +141,20 @@ namespace NzbDrone.Core.MediaFiles
             // TODO: This belongs in the ImportDecisionMaker or ParsingService.
 
             Series directorySeries = null;
-            ParsedEpisodeInfo directoryEpisodeInfo = null;
+            QualityModel directoryQuality = null;
             Series fileSeries = null;
             
             if (directoryName != null)
             {
                 directorySeries = _parsingService.GetSeries(directoryName);
-                directoryEpisodeInfo = Parser.Parser.ParsePath(directoryName);
-                
-                if (directoryEpisodeInfo != null)
-                _logger.Debug("{0} folder quality: {1}", directoryName, directoryEpisodeInfo.Quality);
+                directoryQuality = QualityParser.ParseQuality(directoryName);
+
+                if (directoryQuality != null)
+                {
+                    _logger.Debug("{0} folder quality: {1}", directoryName, directoryQuality);
+                }
             }
-            
+
             foreach (var fileSet in fileSets)
             {
                 fileSeries = _parsingService.GetSeries(Path.GetFileName(fileSet.VideoFile));
@@ -161,7 +163,7 @@ namespace NzbDrone.Core.MediaFiles
                     break;
             }
 
-            var series = fileSeries ?? directorySeries;
+            var series = directorySeries ?? fileSeries;
             
             if (series == null)
             {
@@ -169,7 +171,8 @@ namespace NzbDrone.Core.MediaFiles
                 return new List<ImportDecision>();
             }
 
-            var decisions = _importDecisionMaker.GetImportDecisions(fileSets.Select(c => c.VideoFile).ToList(), series, true, directoryEpisodeInfo.Quality);
+            var decisions = _importDecisionMaker.GetImportDecisions(fileSets.ToList(), series, true, directoryQuality);
+
             return _importApprovedEpisodes.Import(decisions, true);
         }
 

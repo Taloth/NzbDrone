@@ -20,7 +20,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
     [TestFixture]
     public class ImportDecisionMakerFixture : CoreTest<ImportDecisionMaker>
     {
-        private List<string> _videoFiles;
+        private List<FileSet> _videoFiles;
         private LocalEpisode _localEpisode;
         private Series _series;
         private QualityModel _quality;
@@ -63,7 +63,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
             _fail3.Setup(c => c.IsSatisfiedBy(It.IsAny<LocalEpisode>())).Returns(false);
             _fail3.Setup(c => c.RejectionReason).Returns("_fail3");
 
-            _videoFiles = new List<string> { @"C:\Test\Unsorted\The.Office.S03E115.DVDRip.XviD-OSiTV.avi" };
+            _videoFiles = new List<FileSet> { new FileSet(@"C:\Test\Unsorted\The.Office.S03E115.DVDRip.XviD-OSiTV.avi") };
             _series = Builder<Series>.CreateNew()
                                      .With(e => e.QualityProfile = new QualityProfile { Items = Qualities.QualityFixture.GetDefaultQualities() })
                                      .Build();
@@ -153,11 +153,11 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
             Mocker.GetMock<IParsingService>().Setup(c => c.GetLocalEpisode(It.IsAny<String>(), It.IsAny<Series>(), It.IsAny<Boolean>()))
                      .Throws<TestException>();
 
-            _videoFiles = new List<String>
+            _videoFiles = new List<FileSet>
                 {
-                    "The.Office.S03E115.DVDRip.XviD-OSiTV",
-                    "The.Office.S03E115.DVDRip.XviD-OSiTV",
-                    "The.Office.S03E115.DVDRip.XviD-OSiTV"
+                    new FileSet("The.Office.S03E115.DVDRip.XviD-OSiTV"),
+                    new FileSet("The.Office.S03E115.DVDRip.XviD-OSiTV"),
+                    new FileSet("The.Office.S03E115.DVDRip.XviD-OSiTV")
                 };
 
 
@@ -177,7 +177,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
         public void should_use_file_quality_if_folder_quality_is_null()
         {
             GivenSpecifications(_pass1, _pass2, _pass3);
-            var expectedQuality = QualityParser.ParseQuality(_videoFiles.Single());
+            var expectedQuality = QualityParser.ParseQuality(_videoFiles.Single().VideoFile);
 
             var result = Subject.GetImportDecisions(_videoFiles, _series, false, null);
 
@@ -188,7 +188,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
         public void should_use_file_quality_if_folder_quality_is_lower_than_file_quality()
         {
             GivenSpecifications(_pass1, _pass2, _pass3);
-            var expectedQuality = QualityParser.ParseQuality(_videoFiles.Single());
+            var expectedQuality = QualityParser.ParseQuality(_videoFiles.Single().VideoFile);
 
             var result = Subject.GetImportDecisions(_videoFiles, _series, false, new QualityModel(Quality.SDTV));
 

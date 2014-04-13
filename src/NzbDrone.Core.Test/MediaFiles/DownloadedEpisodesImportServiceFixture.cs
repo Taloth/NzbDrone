@@ -41,6 +41,9 @@ namespace NzbDrone.Core.Test.MediaFiles
             Mocker.GetMock<IConfigService>().SetupGet(c => c.DownloadedEpisodesFolder)
                   .Returns("c:\\drop\\".AsOsAgnostic());
 
+            Mocker.GetMock<IConfigService>().SetupGet(c => c.DownloadClientWorkingFolders)
+                  .Returns("_UNPACK_|_FAILED_");
+
             Mocker.GetMock<IImportApprovedEpisodes>()
                   .Setup(s => s.Import(It.IsAny<List<ImportDecision>>(), true))
                   .Returns(new List<ImportDecision>());
@@ -94,7 +97,7 @@ namespace NzbDrone.Core.Test.MediaFiles
             Subject.Execute(new DownloadedEpisodesScanCommand());
 
             Mocker.GetMock<IMakeImportDecision>()
-                .Verify(c => c.GetImportDecisions(It.IsAny<List<string>>(), It.IsAny<Series>(), It.IsAny<bool>(), It.IsAny<Core.Qualities.QualityModel>()),
+                .Verify(c => c.GetImportDecisions(It.IsAny<List<FileSet>>(), It.IsAny<Series>(), It.IsAny<bool>(), It.IsAny<Core.Qualities.QualityModel>()),
                     Times.Never());
 
             VerifyNoImport();
@@ -133,7 +136,7 @@ namespace NzbDrone.Core.Test.MediaFiles
         }
 
         [Test]
-        public void should_delete_folder_if_files_were_imported_and_video_files_remain()
+        public void should_not_delete_folder_if_files_were_imported_and_video_files_remain()
         {
             GivenValidSeries();
 
@@ -143,7 +146,7 @@ namespace NzbDrone.Core.Test.MediaFiles
             imported.Add(new ImportDecision(localEpisode));
 
             Mocker.GetMock<IMakeImportDecision>()
-                  .Setup(s => s.GetImportDecisions(It.IsAny<List<String>>(), It.IsAny<Series>(), true, null))
+                  .Setup(s => s.GetImportDecisions(It.IsAny<List<FileSet>>(), It.IsAny<Series>(), true, null))
                   .Returns(imported);
 
             Mocker.GetMock<IImportApprovedEpisodes>()
@@ -169,7 +172,7 @@ namespace NzbDrone.Core.Test.MediaFiles
             imported.Add(new ImportDecision(localEpisode));
 
             Mocker.GetMock<IMakeImportDecision>()
-                  .Setup(s => s.GetImportDecisions(It.IsAny<List<String>>(), It.IsAny<Series>(), true, null))
+                  .Setup(s => s.GetImportDecisions(It.IsAny<List<FileSet>>(), It.IsAny<Series>(), true, null))
                   .Returns(imported);
 
             Mocker.GetMock<IImportApprovedEpisodes>()
@@ -188,26 +191,6 @@ namespace NzbDrone.Core.Test.MediaFiles
 
             Mocker.GetMock<IDiskProvider>()
                   .Verify(v => v.DeleteFolder(It.IsAny<String>(), true), Times.Once());
-        }
-
-        [TestCase("_UNPACK_")]
-        [TestCase("_FAILED_")]
-        public void should_remove_unpack_from_folder_name(string prefix)
-        {
-            var folderName = "30.rock.s01e01.pilot.hdtv-lol";
-            var folders = new[] { String.Format(@"C:\Test\Unsorted\{0}{1}", prefix, folderName).AsOsAgnostic() };
-
-            Mocker.GetMock<IDiskProvider>()
-                  .Setup(c => c.GetDirectories(It.IsAny<string>()))
-                  .Returns(folders);
-
-            Subject.Execute(new DownloadedEpisodesScanCommand());
-
-            Mocker.GetMock<IParsingService>()
-                .Verify(v => v.GetSeries(folderName), Times.Once());
-
-            Mocker.GetMock<IParsingService>()
-                .Verify(v => v.GetSeries(It.Is<String>(s => s.StartsWith(prefix))), Times.Never());
         }
 
         private void VerifyNoImport()

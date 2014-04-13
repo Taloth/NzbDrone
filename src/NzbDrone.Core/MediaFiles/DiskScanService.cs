@@ -83,7 +83,7 @@ namespace NzbDrone.Core.MediaFiles
             _logger.Trace("Finished getting episode files for: {0} [{1}]", series, videoFilesStopwatch.Elapsed);
 
             var decisionsStopwatch = Stopwatch.StartNew();
-            var decisions = _importDecisionMaker.GetImportDecisions(mediaFileList.Select(v => v.VideoFile).ToList(), series, false);
+            var decisions = _importDecisionMaker.GetImportDecisions(mediaFileList, series, false);
             decisionsStopwatch.Stop();
             _logger.Trace("Import decisions complete for: {0} [{1}]", series, decisionsStopwatch.Elapsed);
 
@@ -108,6 +108,7 @@ namespace NzbDrone.Core.MediaFiles
             _logger.Debug("{0} media files were found in {1}", mediaFileList.Count, path);
 
             var remainingFileList = filesOnDisk.Except(mediaFileList).ToList();
+            var fileSets = new List<FileSet>();
 
             foreach (var mediaFile in mediaFileList)
             {
@@ -123,11 +124,13 @@ namespace NzbDrone.Core.MediaFiles
                     }
                 }
 
-                yield return fileSet;
+                fileSets.Add(fileSet);
             }
 
             if (remainingFileList.Count != 0)
                 _logger.Debug("{0} files in {1} could not be associated with a media file and will be ignored", remainingFileList.Count, path);
+
+            return fileSets;
         }
 
         public void Handle(SeriesUpdatedEvent message)

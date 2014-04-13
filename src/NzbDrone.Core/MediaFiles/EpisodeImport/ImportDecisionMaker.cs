@@ -15,7 +15,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
 {
     public interface IMakeImportDecision
     {
-        List<ImportDecision> GetImportDecisions(List<String> videoFiles, Series series, bool sceneSource, QualityModel quality = null);
+        List<ImportDecision> GetImportDecisions(List<FileSet> fileSets, Series series, bool sceneSource, QualityModel quality = null);
     }
 
     public class ImportDecisionMaker : IMakeImportDecision
@@ -40,57 +40,61 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
             _logger = logger;
         }
 
-        public List<ImportDecision> GetImportDecisions(List<string> videoFiles, Series series, bool sceneSource, QualityModel quality = null)
+        public List<ImportDecision> GetImportDecisions(List<FileSet> fileSets, Series series, bool sceneSource, QualityModel quality = null)
         {
             var newFiles = _mediaFileService.FilterExistingFiles(videoFiles.ToList(), series.Id);
 
-            _logger.Debug("Analyzing {0}/{1} files.", newFiles.Count, videoFiles.Count());
+            _logger.Debug("Analyzing {0}/{1} files.", newFiles.Count, fileSets.Count());
 
-            return GetDecisions(newFiles, series, sceneSource, quality).ToList();
-        }
+            List<ImportDecision> importDecisions = new List<ImportDecision>();
 
-        private IEnumerable<ImportDecision> GetDecisions(IEnumerable<String> videoFiles, Series series, bool sceneSource, QualityModel quality = null)
-        {
-            foreach (var file in videoFiles)
+            foreach (var fileSet in fileSets)
             {
-                ImportDecision decision = null;
-
-                try
-                {
-                    var parsedEpisode = _parsingService.GetLocalEpisode(file, series, sceneSource);
-                    
-                    if (parsedEpisode != null)
-                    {
-                        if (quality != null && new QualityModelComparer(parsedEpisode.Series.QualityProfile).Compare(quality, parsedEpisode.Quality) > 0)
-                        {
-                            _logger.Debug("Using quality from folder: {0}", quality);
-                            parsedEpisode.Quality = quality;
-                        }
-
-                        parsedEpisode.Size = _diskProvider.GetFileSize(file);
-                        _logger.Debug("Size: {0}", parsedEpisode.Size);
-
-                        decision = GetDecision(parsedEpisode);
-                    }
-
-                    else
-                    {
-                        parsedEpisode = new LocalEpisode();
-                        parsedEpisode.FileSet = new FileSet(file);
-
-                        decision = new ImportDecision(parsedEpisode, "Unable to parse file");
-                    }
-                }
-                catch (Exception e)
-                {
-                    _logger.ErrorException("Couldn't import file." + file, e);
-                }
+                ImportDecision decision = GetDecision(fileSet, series, sceneSource, quality);
 
                 if (decision != null)
+                    importDecisions.Add(decision);
+            }
+
+            return importDecisions;
+        }
+
+        private ImportDecision GetDecision(FileSet fileSet, Series series, bool sceneSource, QualityModel quality = null)
+        {
+            ImportDecision decision = null;
+
+            try
+            {
+                var parsedEpisode = _parsingService.GetLocalEpisode(fileSet.VideoFile, series, sceneSource);
+                    
+                if (parsedEpisode != null)
                 {
-                    yield return decision;
+                    if (quality != null && new QualityModelComparer(parsedEpisode.Series.QualityProfile).Compare(quality, parsedEpisode.Quality) > 0)
+                    {
+                        _logger.Debug("Using quality from folder: {0}", quality);
+                        parsedEpisode.Quality = quality;
+                    }
+
+                    parsedEpisode.Size = _diskProvider.GetFileSize(fileSet.VideoFile);
+                    _logger.Debug("Size: {0}", parsedEpisode.Size);
+
+                    decision = GetDecision(parsedEpisode);
+                }
+
+                else
+                {
+                    parsedEpisode = new LocalEpisode();
+                    parsedEpisode.FileSet = fileSet;
+
+                    decision = new ImportDecision(parsedEpisode, "Unable to parse file");
                 }
             }
+            catch (Exception e)
+            {
+                _logger.ErrorException("Couldn't import file: " + fileSet.VideoFile, e);
+            }
+
+            return decision;
         }
 
         private ImportDecision GetDecision(LocalEpisode localEpisode)
