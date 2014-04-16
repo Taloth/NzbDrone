@@ -10,6 +10,7 @@ using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Test.Framework;
 using NzbDrone.Core.Tv;
+using NzbDrone.Test.Common;
 
 namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport.Specifications
 {
@@ -34,7 +35,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport.Specifications
 
             _localEpisode = new LocalEpisode
                                 {
-                                    FileSet = new Core.MediaFiles.FileSet(@"C:\Test\30 Rock\30.rock.s01e01.avi"),
+                                    FileSet = new Core.MediaFiles.FileSet(@"C:\Test\30 Rock\30.rock.s01e01.avi".AsOsAgnostic()),
                                     Episodes = episodes,
                                     Series = _series,
                                     Quality = new QualityModel(Quality.HDTV720p)

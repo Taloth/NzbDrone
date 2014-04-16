@@ -63,7 +63,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
             _fail3.Setup(c => c.IsSatisfiedBy(It.IsAny<LocalEpisode>())).Returns(false);
             _fail3.Setup(c => c.RejectionReason).Returns("_fail3");
 
-            _videoFiles = new List<FileSet> { new FileSet(@"C:\Test\Unsorted\The.Office.S03E115.DVDRip.XviD-OSiTV.avi") };
+            _videoFiles = new List<FileSet> { new FileSet(@"C:\Test\Unsorted\The.Office.S03E115.DVDRip.XviD-OSiTV.avi".AsOsAgnostic()) };
             _series = Builder<Series>.CreateNew()
                                      .With(e => e.QualityProfile = new QualityProfile { Items = Qualities.QualityFixture.GetDefaultQualities() })
                                      .Build();
@@ -73,7 +73,7 @@ namespace NzbDrone.Core.Test.MediaFiles.EpisodeImport
             { 
                 Series = _series,
                 Quality = _quality,
-                FileSet = new Core.MediaFiles.FileSet(@"C:\Test\Unsorted\The.Office.S03E115.DVDRip.XviD-OSiTV.avi")
+                FileSet = new Core.MediaFiles.FileSet(@"C:\Test\Unsorted\The.Office.S03E115.DVDRip.XviD-OSiTV.avi".AsOsAgnostic())
             };
 
             Mocker.GetMock<IParsingService>()

@@ -42,7 +42,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
 
         public List<ImportDecision> GetImportDecisions(List<FileSet> fileSets, Series series, bool sceneSource, QualityModel quality = null)
         {
-            var newFiles = _mediaFileService.FilterExistingFiles(videoFiles.ToList(), series.Id);
+            var newFiles = _mediaFileService.FilterExistingFiles(fileSets, series.Id);
 
             _logger.Debug("Analyzing {0}/{1} files.", newFiles.Count, fileSets.Count());
 
