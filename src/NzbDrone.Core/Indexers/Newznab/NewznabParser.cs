@@ -35,6 +35,31 @@ namespace NzbDrone.Core.Indexers.Newznab
             return base.GetPublishDate(item);
         }
 
+        protected override ReleaseUserRatings GetUserRatings(XElement item)
+        {
+            var attributes = item.Elements("attr").ToList();
+            var spam_reports = attributes.SingleOrDefault(e => e.Attribute("name").Value.Equals("oz_num_spam_reports", StringComparison.CurrentCultureIgnoreCase)).Attribute("value").Value;
+            var spam_confirmed = attributes.SingleOrDefault(e => e.Attribute("name").Value.Equals("oz_spam_confirmed", StringComparison.CurrentCultureIgnoreCase)).Attribute("value").Value;
+            var passworded_reports = attributes.SingleOrDefault(e => e.Attribute("name").Value.Equals("oz_num_passworded_reports", StringComparison.CurrentCultureIgnoreCase)).Attribute("value").Value;
+            var passworded_confirmed = attributes.SingleOrDefault(e => e.Attribute("name").Value.Equals("oz_passworded_confirmed", StringComparison.CurrentCultureIgnoreCase)).Attribute("value").Value;
+            var up_votes = attributes.SingleOrDefault(e => e.Attribute("name").Value.Equals("oz_up_votes", StringComparison.CurrentCultureIgnoreCase)).Attribute("value").Value;
+            var down_votes = attributes.SingleOrDefault(e => e.Attribute("name").Value.Equals("oz_down_votes", StringComparison.CurrentCultureIgnoreCase)).Attribute("value").Value;
+            var video_quality_rating = attributes.SingleOrDefault(e => e.Attribute("name").Value.Equals("oz_video_quality_rating", StringComparison.CurrentCultureIgnoreCase)).Attribute("value").Value;
+            var audio_quality_rating = attributes.SingleOrDefault(e => e.Attribute("name").Value.Equals("oz_audio_quality_rating", StringComparison.CurrentCultureIgnoreCase)).Attribute("value").Value;
+            ReleaseUserRatings userRating = new ReleaseUserRatings()
+            {
+                SpamReports = !string.IsNullOrWhiteSpace(spam_reports) ? Convert.ToInt32(spam_reports) + 0 : 0,
+                IsSpamConfirmed = spam_confirmed == "yes",
+                PasswordedReports = !string.IsNullOrWhiteSpace(passworded_reports) ? Convert.ToInt32(passworded_reports) : 0,
+                IsPasswordedConfirmed = passworded_confirmed == "yes",
+                UpVotes = !string.IsNullOrWhiteSpace(up_votes) && !(up_votes == "-") ? Convert.ToInt32(up_votes) : 0,
+                DownVotes = !string.IsNullOrWhiteSpace(down_votes) && !(down_votes == "-") ? Convert.ToInt32(down_votes) : 0,
+                VideoRating = !string.IsNullOrWhiteSpace(video_quality_rating) && !(video_quality_rating == "-") ? Convert.ToDouble(video_quality_rating) : 0,
+                AudioRating = !string.IsNullOrWhiteSpace(audio_quality_rating) && !(audio_quality_rating == "-") ? Convert.ToDouble(audio_quality_rating) : 0
+            };
+            return userRating;
+        }
+
         protected override long GetSize(XElement item)
         {
             var attributes = item.Elements("attr").ToList();

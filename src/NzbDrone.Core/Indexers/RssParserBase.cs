@@ -74,6 +74,16 @@ namespace NzbDrone.Core.Indexers
             reportInfo.DownloadUrl = GetNzbUrl(item);
             reportInfo.InfoUrl = GetNzbInfoUrl(item);
 
+            if (url.Contains("oznzb.com"))
+            {
+                reportInfo.UserRatings = GetUserRatings(item);
+                reportInfo.UserRatings.RatingCeiling = 10;
+                if (reportInfo.UserRatings.IsPasswordedConfirmed == true || reportInfo.UserRatings.IsSpamConfirmed == true)
+                {
+                    return null;
+                }
+            }
+
             try
             {
                 reportInfo.Size = GetSize(item);
@@ -109,6 +119,11 @@ namespace NzbDrone.Core.Indexers
         }
 
         protected abstract long GetSize(XElement item);
+
+        protected virtual ReleaseUserRatings GetUserRatings(XElement item)
+        {
+            return null;
+        }
 
         protected virtual void PreProcess(string source, string url)
         {
