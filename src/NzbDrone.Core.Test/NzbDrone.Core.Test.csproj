@@ -125,7 +125,9 @@
     <Compile Include="DecisionEngineTests\RssSync\DelaySpecificationFixture.cs" />
     <Compile Include="DecisionEngineTests\RssSync\ProperSpecificationFixture.cs" />
     <Compile Include="DecisionEngineTests\Search\SeriesSpecificationFixture.cs" />
+    <Compile Include="DecisionEngineTests\UserRatingsSpecificationFixture.cs" />
     <Compile Include="DecisionEngineTests\UpgradeDiskSpecificationFixture.cs" />
+    <Compile Include="DecisionEngineTests\UserRatingsComparerFixture.cs" />
     <Compile Include="Download\CompletedDownloadServiceFixture.cs" />
     <Compile Include="Download\DownloadApprovedReportsTests\DownloadApprovedFixture.cs" />
     <Compile Include="Download\DownloadClientTests\Blackhole\UsenetBlackholeFixture.cs" />
@@ -135,9 +137,9 @@
     <Compile Include="Download\DownloadClientTests\SabnzbdTests\SabnzbdFixture.cs" />
     <Compile Include="Download\DownloadServiceFixture.cs" />
     <Compile Include="Download\FailedDownloadServiceFixture.cs" />
-    <Compile Include="Download\Pending\PendingReleaseServiceTests\RemoveRejectedFixture.cs" />
-    <Compile Include="Download\Pending\PendingReleaseServiceTests\RemoveGrabbedFixture.cs" />
     <Compile Include="Download\Pending\PendingReleaseServiceTests\AddFixture.cs" />
+    <Compile Include="Download\Pending\PendingReleaseServiceTests\RemoveGrabbedFixture.cs" />
+    <Compile Include="Download\Pending\PendingReleaseServiceTests\RemoveRejectedFixture.cs" />
     <Compile Include="FluentTest.cs" />
     <Compile Include="Framework\CoreTest.cs" />
     <Compile Include="Framework\DbTest.cs" />
@@ -169,6 +171,7 @@
     <Compile Include="IndexerTests\IndexerServiceFixture.cs" />
     <Compile Include="IndexerTests\IntegrationTests\IndexerIntegrationTests.cs" />
     <Compile Include="IndexerTests\NewznabTests\NewznabSettingFixture.cs" />
+    <Compile Include="IndexerTests\NewznabTests\OzNzbParserFixture.cs" />
     <Compile Include="IndexerTests\SeasonSearchFixture.cs" />
     <Compile Include="IndexerTests\XElementExtensionsFixture.cs" />
     <Compile Include="InstrumentationTests\DatabaseTargetFixture.cs" />
@@ -345,6 +348,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Files\RSS\omgwtfnzbs.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\RSS\oznzb.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Files\RSS\SizeParsing\newznab.xml">

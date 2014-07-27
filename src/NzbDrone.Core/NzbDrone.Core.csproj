@@ -258,6 +258,8 @@
     <Compile Include="DecisionEngine\Specifications\Search\SeriesSpecification.cs" />
     <Compile Include="DecisionEngine\Specifications\Search\SingleEpisodeSearchMatchSpecification.cs" />
     <Compile Include="DecisionEngine\Specifications\UpgradeDiskSpecification.cs" />
+    <Compile Include="DecisionEngine\Specifications\UserRatingsSpecification.cs" />
+    <Compile Include="DecisionEngine\UserRatingsComparer.cs" />
     <Compile Include="DiskSpace\DiskSpace.cs" />
     <Compile Include="DiskSpace\DiskSpaceService.cs" />
     <Compile Include="Download\CheckForFinishedDownloadCommand.cs" />
@@ -392,6 +394,7 @@
     <Compile Include="Indexers\Newznab\NewznabParser.cs" />
     <Compile Include="Indexers\Newznab\NewznabPreProcessor.cs" />
     <Compile Include="Indexers\Newznab\NewznabSettings.cs" />
+    <Compile Include="Indexers\Newznab\OzNzbParser.cs" />
     <Compile Include="Indexers\Newznab\SizeParsingException.cs" />
     <Compile Include="Indexers\NewznabTestService.cs" />
     <Compile Include="Indexers\Omgwtfnzbs\Omgwtfnzbs.cs" />

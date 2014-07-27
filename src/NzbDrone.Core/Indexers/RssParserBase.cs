@@ -73,16 +73,7 @@ namespace NzbDrone.Core.Indexers
             reportInfo.PublishDate = GetPublishDate(item);
             reportInfo.DownloadUrl = GetNzbUrl(item);
             reportInfo.InfoUrl = GetNzbInfoUrl(item);
-
-            if (url.Contains("oznzb.com"))
-            {
-                reportInfo.UserRatings = GetUserRatings(item);
-                reportInfo.UserRatings.RatingCeiling = 10;
-                if (reportInfo.UserRatings.IsPasswordedConfirmed == true || reportInfo.UserRatings.IsSpamConfirmed == true)
-                {
-                    return null;
-                }
-            }
+            reportInfo.UserRatings = GetUserRatings(item);
 
             try
             {

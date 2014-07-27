@@ -37,7 +37,14 @@ namespace NzbDrone.Core.Indexers.Newznab
         {
             get
             {
-                return new NewznabParser();
+                if (Settings.Url.Contains("oznzb.com"))
+                {
+                    return new OzNzbParser();
+                }
+                else
+                {
+                    return new NewznabParser();
+                }
             }
         }
 
