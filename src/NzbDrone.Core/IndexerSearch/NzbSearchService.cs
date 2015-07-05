@@ -261,7 +261,7 @@ namespace NzbDrone.Core.IndexerSearch
             foreach (var indexer in indexers)
             {
                 var indexerStatus = _indexerStatusService.GetIndexerStatus(indexer.Definition.Id);
-                if (indexerStatus != null && indexerStatus.DisabledTill.HasValue && indexerStatus.DisabledTill.Value > DateTime.UtcNow)
+                if (indexerStatus != null && indexerStatus.IsDisabled())
                 {
                     _logger.Debug("Temporarily ignoring indexer {0} till {1} due to recent failures.", indexer.Definition.Name, indexerStatus.DisabledTill.Value);
                     continue;

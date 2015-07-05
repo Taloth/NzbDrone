@@ -19,10 +19,11 @@ namespace NzbDrone.Core.HealthCheck.Checks
         public override HealthCheck Check()
         {
             var enabledIndexers = _indexerFactory.GetAvailableProviders();
-            var backOffIndexers = enabledIndexers
-                .Select(v => Tuple.Create(v, _indexerStatusService.GetIndexerStatus(v.Definition.Id)))
-                .Where(v => v.Item2 != null && v.Item2.DisabledTill.HasValue && v.Item2.DisabledTill > DateTime.UtcNow &&
-                      (v.Item2.MostRecentFailure - v.Item2.InitialFailure) > TimeSpan.FromHours(1))
+            var backOffIndexers = enabledIndexers.Join(_indexerStatusService.GetBlockedIndexers(),
+                    i => i.Definition.Id,
+                    s => s.IndexerId,
+                    (i, s) => new { Indexer = i, Status = s })
+                .Where(v => (v.Status.MostRecentFailure - v.Status.InitialFailure) > TimeSpan.FromHours(1))
                 .ToList();
 
             if (backOffIndexers.Empty())
@@ -32,16 +33,16 @@ namespace NzbDrone.Core.HealthCheck.Checks
 
             if (backOffIndexers.Count == enabledIndexers.Count)
             {
-                return new HealthCheck(GetType(), HealthCheckResult.Error, "All indexers unusable due to failures", "#indexer-unusable-due-to-failures");
+                return new HealthCheck(GetType(), HealthCheckResult.Error, "All indexers unusable due to failures", "#indexers-are-unavailable-due-to-failures");
             }
 
             if (backOffIndexers.Count > 1)
             {
-                return new HealthCheck(GetType(), HealthCheckResult.Warning, "Multiple indexers unusable due to failures", "#indexer-unusable-due-to-failures");
+                return new HealthCheck(GetType(), HealthCheckResult.Warning, string.Format("{0} indexers are unavailable due to failures", backOffIndexers.Count), "#indexers-are-unavailable-due-to-failures");
             }
 
             var indexer = backOffIndexers.First();
-            return new HealthCheck(GetType(), HealthCheckResult.Warning, string.Format("Indexer {0} unusable due to failures", indexer.Item1.Definition.Name), "#indexer-unusable-due-to-failures");
+            return new HealthCheck(GetType(), HealthCheckResult.Warning, string.Format("Indexer {0} unusable due to failures", indexer.Indexer.Definition.Name), "#indexers-are-unavailable-due-to-failures");
         }
     }
 }

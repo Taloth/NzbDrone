@@ -17,5 +17,10 @@ namespace NzbDrone.Core.Indexers
 
         public DateTime? LastContinuousRssSync { get; set; }
         public ReleaseInfo LastRssSyncReleaseInfo { get; set; }
+
+        public bool IsDisabled()
+        {
+            return DisabledTill.HasValue && DisabledTill.Value > DateTime.UtcNow;
+        }
     }
 }

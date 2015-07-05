@@ -45,7 +45,7 @@ namespace NzbDrone.Core.Test.IndexerTests
 
             var status = Subject.GetIndexerStatus(1);
             status.DisabledTill.Should().HaveValue();
-            status.DisabledTill.Value.Should().BeCloseTo(_epoch + TimeSpan.FromSeconds(5), 500);
+            status.DisabledTill.Value.Should().BeCloseTo(_epoch + TimeSpan.FromMinutes(5), 500);
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace NzbDrone.Core.Test.IndexerTests
 
             var status = Subject.GetIndexerStatus(1);
             status.DisabledTill.Should().HaveValue();
-            status.DisabledTill.Value.Should().BeCloseTo(_epoch + TimeSpan.FromSeconds(10), 500);
+            status.DisabledTill.Value.Should().BeCloseTo(_epoch + TimeSpan.FromMinutes(15), 500);
         }
     }
 }

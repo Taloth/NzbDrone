@@ -90,7 +90,7 @@ namespace NzbDrone.Core.Indexers
                     }
                     var lastRecentSearch = indexerStatus.LastContinuousRssSync.Value;
 
-                    if (indexerStatus.DisabledTill.HasValue && indexerStatus.DisabledTill.Value > rssStarted)
+                    if (indexerStatus.IsDisabled())
                     {
                         _logger.Debug("Indexer {0} last continous rss sync was till {1}. But indexer is temporarily disabled, unable to search for missing episodes.", indexer.Definition.Name, lastRecentSearch);
                         continue;

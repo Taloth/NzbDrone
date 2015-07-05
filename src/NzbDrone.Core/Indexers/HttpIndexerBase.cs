@@ -157,21 +157,16 @@ namespace NzbDrone.Core.Indexers
                                 break;
                             }
 
-                            if (pagedReleases.Count >= MaxNumResultsPerQuery)
+                            if (pagedReleases.Count >= MaxNumResultsPerQuery &&
+                                oldestDate < DateTime.UtcNow - TimeSpan.FromHours(24))
                             {
-                                if (oldestDate < DateTime.UtcNow - TimeSpan.FromHours(24))
-                                {
-                                    fullyUpdated = false;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (pagedReleases.Count >= MaxNumResultsPerQuery)
-                            {
+                                fullyUpdated = false;
                                 break;
                             }
+                        }
+                        else if (pagedReleases.Count >= MaxNumResultsPerQuery)
+                        {
+                            break;
                         }
 
                         if (!IsFullPage(page))
@@ -193,15 +188,14 @@ namespace NzbDrone.Core.Indexers
             }
             catch (WebException webException)
             {
+                _indexerStatusService.ReportFailure(Definition.Id);
                 if (webException.Message.Contains("502") || webException.Message.Contains("503") ||
                     webException.Message.Contains("timed out"))
                 {
-                    _indexerStatusService.ReportFailure(Definition.Id);
                     _logger.Warn("{0} server is currently unavailable. {1} {2}", this, url, webException.Message);
                 }
                 else
                 {
-                    _indexerStatusService.ReportFailure(Definition.Id);
                     _logger.Warn("{0} {1} {2}", this, url, webException.Message);
                 }
             }

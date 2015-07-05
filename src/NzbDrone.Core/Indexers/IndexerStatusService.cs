@@ -45,9 +45,7 @@ namespace NzbDrone.Core.Indexers
 
         public List<IndexerStatus> GetBlockedIndexers()
         {
-            return _indexerStatusRepository.All()
-                .Where(v => v.DisabledTill.HasValue || v.DisabledTill.Value < DateTime.UtcNow)
-                .ToList();
+            return _indexerStatusRepository.All().Where(v => v.IsDisabled()).ToList();
         }
 
         public IndexerStatus GetIndexerStatus(int indexerId)
