@@ -42,9 +42,9 @@ namespace NzbDrone.Core.Test.HealthCheck.Checks
                     .Returns(new IndexerStatus
                     {
                         IndexerId = id,
-                        FirstFailure = DateTime.UtcNow.AddHours(-failureHours),
-                        LastFailure = DateTime.UtcNow.AddHours(-0.1),
-                        FailureEscalation = 5,
+                        InitialFailure = DateTime.UtcNow.AddHours(-failureHours),
+                        MostRecentFailure = DateTime.UtcNow.AddHours(-0.1),
+                        EscalationLevel = 5,
                         DisabledTill = DateTime.UtcNow.AddHours(backoffHours)
                     });
             }

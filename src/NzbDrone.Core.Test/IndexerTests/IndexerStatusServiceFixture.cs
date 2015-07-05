@@ -51,7 +51,7 @@ namespace NzbDrone.Core.Test.IndexerTests
         [Test]
         public void should_cancel_backoff_on_success()
         {
-            WithStatus(new IndexerStatus { FailureEscalation = 2 });
+            WithStatus(new IndexerStatus { EscalationLevel = 2 });
 
             Subject.ReportSuccess(1);
 
@@ -64,7 +64,7 @@ namespace NzbDrone.Core.Test.IndexerTests
         [Test]
         public void should_not_store_update_if_already_okay()
         {
-            WithStatus(new IndexerStatus { FailureEscalation = 0 });
+            WithStatus(new IndexerStatus { EscalationLevel = 0 });
 
             Subject.ReportSuccess(1);
 
@@ -74,7 +74,7 @@ namespace NzbDrone.Core.Test.IndexerTests
         [Test]
         public void should_preserve_escalation_on_intermittent_success()
         {
-            WithStatus(new IndexerStatus { LastFailure = _epoch - TimeSpan.FromSeconds(4), FailureEscalation = 3 });
+            WithStatus(new IndexerStatus { MostRecentFailure = _epoch - TimeSpan.FromSeconds(4), EscalationLevel = 3 });
 
             Subject.ReportSuccess(1);
             Subject.ReportSuccess(1);

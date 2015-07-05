@@ -186,7 +186,7 @@ namespace NzbDrone.Core.Indexers
                 if (isRecent && !releases.Empty())
                 {
                     lastReleaseInfo = releases.OrderByDescending(v => v.PublishDate).First();
-                    _indexerStatusService.UpdateRecentSearchStatus(Definition.Id, lastReleaseInfo, fullyUpdated);
+                    _indexerStatusService.UpdateRssSyncStatus(Definition.Id, lastReleaseInfo, fullyUpdated);
                 }
 
                 _indexerStatusService.ReportSuccess(Definition.Id);

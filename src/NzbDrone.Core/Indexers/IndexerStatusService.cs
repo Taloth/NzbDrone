@@ -9,18 +9,28 @@ namespace NzbDrone.Core.Indexers
 {
     public interface IIndexerStatusService
     {
+        List<IndexerStatus> GetBlockedIndexers();
         IndexerStatus GetIndexerStatus(int indexerId);
         void ReportSuccess(int indexerId);
         void ReportFailure(int indexerId, TimeSpan minimumBackOff = default(TimeSpan));
 
-        void UpdateRecentSearchStatus(int indexerId, ReleaseInfo releaseInfo, bool fullyUpdated);
+        void UpdateRssSyncStatus(int indexerId, ReleaseInfo releaseInfo, bool fullyUpdated);
     }
 
     public class IndexerStatusService : IIndexerStatusService
     {
-        const int MinimumBackOffPeriod = 5 * 60;
-        const int MaximumBackOffPeriod = 24 * 60 * 60;
-        const int MaximumEscalation = 10;
+        private static readonly int[] EscalationBackOffPeriods = {
+                                                                     0,
+                                                                     5 * 60,
+                                                                     15 * 60,
+                                                                     30 * 60,
+                                                                     60 * 60,
+                                                                     3 * 60 * 60,
+                                                                     6 * 60 * 60,
+                                                                     12 * 60 * 60,
+                                                                     24 * 60 * 60
+                                                                 };
+        private static readonly int MaximumEscalationLevel = EscalationBackOffPeriods.Length - 1;
 
         private static readonly object _syncRoot = new object();
 
@@ -33,6 +43,13 @@ namespace NzbDrone.Core.Indexers
             _logger = logger;
         }
 
+        public List<IndexerStatus> GetBlockedIndexers()
+        {
+            return _indexerStatusRepository.All()
+                .Where(v => v.DisabledTill.HasValue || v.DisabledTill.Value < DateTime.UtcNow)
+                .ToList();
+        }
+
         public IndexerStatus GetIndexerStatus(int indexerId)
         {
             return _indexerStatusRepository.FindByIndexerId(indexerId) ?? new IndexerStatus { IndexerId = indexerId };
@@ -40,14 +57,9 @@ namespace NzbDrone.Core.Indexers
 
         private TimeSpan CalculateBackOffPeriod(IndexerStatus status)
         {
-            if (status.FailureEscalation == 0 || !status.LastFailure.HasValue)
-            {
-                return TimeSpan.Zero;
-            }
+            var level = Math.Min(MaximumEscalationLevel, status.EscalationLevel);
 
-            var backOffPeriod = Math.Min(MaximumBackOffPeriod, MinimumBackOffPeriod << (status.FailureEscalation - 1));
-
-            return TimeSpan.FromSeconds(backOffPeriod);
+            return TimeSpan.FromSeconds(EscalationBackOffPeriods[level]);
         }
 
         public void ReportSuccess(int indexerId)
@@ -56,12 +68,12 @@ namespace NzbDrone.Core.Indexers
             {
                 var status = GetIndexerStatus(indexerId);
 
-                if (status.FailureEscalation == 0)
+                if (status.EscalationLevel == 0)
                 {
                     return;
                 }
 
-                status.FailureEscalation--;
+                status.EscalationLevel--;
                 status.DisabledTill = null;
 
                 _indexerStatusRepository.Upsert(status);
@@ -76,19 +88,19 @@ namespace NzbDrone.Core.Indexers
 
                 var now = DateTime.UtcNow;
 
-                if (status.FailureEscalation == 0)
+                if (status.EscalationLevel == 0)
                 {
-                    status.FirstFailure = now;
+                    status.InitialFailure = now;
                 }
 
-                status.LastFailure = now;
-                status.FailureEscalation = Math.Min(MaximumEscalation, status.FailureEscalation + 1);
+                status.MostRecentFailure = now;
+                status.EscalationLevel = Math.Min(MaximumEscalationLevel, status.EscalationLevel + 1);
 
                 if (minimumBackOff != TimeSpan.Zero)
                 {
-                    while (status.FailureEscalation != MaximumEscalation && CalculateBackOffPeriod(status) < minimumBackOff)
+                    while (status.EscalationLevel < MaximumEscalationLevel && CalculateBackOffPeriod(status) < minimumBackOff)
                     {
-                        status.FailureEscalation++;
+                        status.EscalationLevel++;
                     }
                 }
 
@@ -98,7 +110,7 @@ namespace NzbDrone.Core.Indexers
             }
         }
 
-        public void UpdateRecentSearchStatus(int indexerId, ReleaseInfo releaseInfo, bool fullyUpdated)
+        public void UpdateRssSyncStatus(int indexerId, ReleaseInfo releaseInfo, bool fullyUpdated)
         {
             lock (_syncRoot)
             {

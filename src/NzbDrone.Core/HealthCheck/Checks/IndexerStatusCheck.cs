@@ -22,7 +22,7 @@ namespace NzbDrone.Core.HealthCheck.Checks
             var backOffIndexers = enabledIndexers
                 .Select(v => Tuple.Create(v, _indexerStatusService.GetIndexerStatus(v.Definition.Id)))
                 .Where(v => v.Item2 != null && v.Item2.DisabledTill.HasValue && v.Item2.DisabledTill > DateTime.UtcNow &&
-                      (v.Item2.LastFailure - v.Item2.FirstFailure) > TimeSpan.FromHours(1))
+                      (v.Item2.MostRecentFailure - v.Item2.InitialFailure) > TimeSpan.FromHours(1))
                 .ToList();
 
             if (backOffIndexers.Empty())

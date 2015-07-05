@@ -10,9 +10,9 @@ namespace NzbDrone.Core.Indexers
     {
         public int IndexerId { get; set; }
 
-        public DateTime? FirstFailure { get; set; }
-        public DateTime? LastFailure { get; set; }
-        public int FailureEscalation { get; set; }
+        public DateTime? InitialFailure { get; set; }
+        public DateTime? MostRecentFailure { get; set; }
+        public int EscalationLevel { get; set; }
         public DateTime? DisabledTill { get; set; }
 
         public DateTime? LastContinuousRssSync { get; set; }

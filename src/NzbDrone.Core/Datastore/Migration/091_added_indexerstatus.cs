@@ -15,9 +15,9 @@ namespace NzbDrone.Core.Datastore.Migration
         {
             Create.TableForModel("IndexerStatus")
                   .WithColumn("IndexerId").AsInt32().NotNullable().Unique()
-                  .WithColumn("FirstFailure").AsDateTime().Nullable()
-                  .WithColumn("LastFailure").AsDateTime().Nullable()
-                  .WithColumn("FailureEscalation").AsInt32().NotNullable()
+                  .WithColumn("InitialFailure").AsDateTime().Nullable()
+                  .WithColumn("MostRecentFailure").AsDateTime().Nullable()
+                  .WithColumn("EscalationLevel").AsInt32().NotNullable()
                   .WithColumn("DisabledTill").AsDateTime().Nullable()
                   .WithColumn("LastContinuousRssSync").AsDateTime().Nullable()
                   .WithColumn("LastRssSyncReleaseInfo").AsString().Nullable();

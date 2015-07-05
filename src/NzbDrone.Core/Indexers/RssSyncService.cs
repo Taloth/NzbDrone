@@ -51,7 +51,10 @@ namespace NzbDrone.Core.Indexers
         {
             _logger.ProgressInfo("Starting RSS Sync");
 
-            var reports = _rssFetcherAndParser.Fetch().Concat(FilterByIndexer(_pendingReleaseService.GetPending())).ToList();
+            var rssReleases = _rssFetcherAndParser.Fetch();
+            var pendingReleases = _pendingReleaseService.GetPending();
+
+            var reports = rssReleases.Concat(pendingReleases).ToList();
             var decisions = _downloadDecisionMaker.GetRssDecision(reports);
             var processed = _processDownloadDecisions.ProcessDecisions(decisions);
 
@@ -65,34 +68,6 @@ namespace NzbDrone.Core.Indexers
             _logger.ProgressInfo(message);
 
             return processed;
-        }
-
-        private IEnumerable<ReleaseInfo> FilterByIndexer(IEnumerable<ReleaseInfo> releases)
-        {
-            var indexerBackOff = new Dictionary<int, bool>();
-
-            foreach (var release in releases)
-            {
-                bool ignore;
-                if (!indexerBackOff.TryGetValue(release.IndexerId, out ignore))
-                {
-                    var indexerStatus = _indexerStatusService.GetIndexerStatus(release.IndexerId);
-
-                    if (indexerStatus == null || !indexerStatus.DisabledTill.HasValue || indexerStatus.DisabledTill.Value < DateTime.UtcNow)
-                    {
-                        indexerBackOff[release.IndexerId] = ignore = false;
-                    }
-                    else
-                    {
-                        indexerBackOff[release.IndexerId] = ignore = true;
-                    }
-                }
-
-                if (!ignore)
-                {
-                    yield return release;
-                }
-            }
         }
 
         public void Execute(RssSyncCommand message)
