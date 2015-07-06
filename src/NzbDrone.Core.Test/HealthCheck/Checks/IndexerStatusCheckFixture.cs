@@ -16,6 +16,7 @@ namespace NzbDrone.Core.Test.HealthCheck.Checks
     public class IndexerStatusCheckFixture : CoreTest<IndexerStatusCheck>
     {
         private List<IIndexer> _indexers = new List<IIndexer>();
+        private List<IndexerStatus> _blockedIndexers = new List<IndexerStatus>();
 
         [SetUp]
         public void SetUp()
@@ -23,6 +24,10 @@ namespace NzbDrone.Core.Test.HealthCheck.Checks
             Mocker.GetMock<IIndexerFactory>()
                   .Setup(v => v.GetAvailableProviders())
                   .Returns(_indexers);
+
+            Mocker.GetMock<IIndexerStatusService>()
+                   .Setup(v => v.GetBlockedIndexers())
+                   .Returns(_blockedIndexers);
         }
 
         private Mock<IIndexer> GivenIndexer(int i, double backoffHours, double failureHours)
@@ -37,9 +42,7 @@ namespace NzbDrone.Core.Test.HealthCheck.Checks
 
             if (backoffHours != 0.0)
             {
-                Mocker.GetMock<IIndexerStatusService>()
-                    .Setup(v => v.GetIndexerStatus(id))
-                    .Returns(new IndexerStatus
+                _blockedIndexers.Add(new IndexerStatus
                     {
                         IndexerId = id,
                         InitialFailure = DateTime.UtcNow.AddHours(-failureHours),
@@ -47,12 +50,6 @@ namespace NzbDrone.Core.Test.HealthCheck.Checks
                         EscalationLevel = 5,
                         DisabledTill = DateTime.UtcNow.AddHours(backoffHours)
                     });
-            }
-            else
-            {
-                Mocker.GetMock<IIndexerStatusService>()
-                    .Setup(v => v.GetIndexerStatus(id))
-                    .Returns(new IndexerStatus() { IndexerId = id });
             }
 
             return mockIndexer;
