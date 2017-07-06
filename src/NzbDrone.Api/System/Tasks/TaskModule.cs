@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.Jobs;
 using NzbDrone.Core.Messaging.Events;
-using NzbDrone.SignalR;
 
 namespace NzbDrone.Api.System.Tasks
 {
@@ -14,8 +13,8 @@ namespace NzbDrone.Api.System.Tasks
 
         private static readonly Regex NameRegex = new Regex("(?<!^)[A-Z]", RegexOptions.Compiled);
 
-        public TaskModule(ITaskManager taskManager, IBroadcastSignalRMessage broadcastSignalRMessage)
-            : base(broadcastSignalRMessage, "system/task")
+        public TaskModule(ITaskManager taskManager)
+            : base("system/task")
         {
             _taskManager = taskManager;
             GetResourceAll = GetAll;

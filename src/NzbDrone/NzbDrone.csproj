@@ -128,14 +128,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.AspNet.SignalR.Core\Microsoft.AspNet.SignalR.Core.csproj">
-      <Project>{1B9A82C4-BCA1-4834-A33E-226F17BE070B}</Project>
-      <Name>Microsoft.AspNet.SignalR.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.AspNet.SignalR.Owin\Microsoft.AspNet.SignalR.Owin.csproj">
-      <Project>{2B8C6DAD-4D85-41B1-83FD-248D9F347522}</Project>
-      <Name>Microsoft.AspNet.SignalR.Owin</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NzbDrone.Common\NzbDrone.Common.csproj">
       <Project>{F2BE0FDF-6E47-4827-A420-DD4EF82407F8}</Project>
       <Name>NzbDrone.Common</Name>

@@ -2,7 +2,6 @@
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.Messaging.Events;
-using NzbDrone.SignalR;
 
 namespace NzbDrone.Api
 {
@@ -10,17 +9,15 @@ namespace NzbDrone.Api
         where TResource : RestResource, new()
         where TModel : ModelBase, new()
     {
-        private readonly IBroadcastSignalRMessage _signalRBroadcaster;
-
-        protected NzbDroneRestModuleWithSignalR(IBroadcastSignalRMessage signalRBroadcaster)
+        protected NzbDroneRestModuleWithSignalR()
         {
-            _signalRBroadcaster = signalRBroadcaster;
+
         }
 
-        protected NzbDroneRestModuleWithSignalR(IBroadcastSignalRMessage signalRBroadcaster, string resource)
+        protected NzbDroneRestModuleWithSignalR(string resource)
             : base(resource)
         {
-            _signalRBroadcaster = signalRBroadcaster;
+
         }
 
         public void Handle(ModelEvent<TModel> message)
@@ -42,25 +39,11 @@ namespace NzbDrone.Api
 
         protected void BroadcastResourceChange(ModelAction action, TResource resource)
         {
-            var signalRMessage = new SignalRMessage
-            {
-                Name = Resource,
-                Body = new ResourceChangeMessage<TResource>(resource, action)
-            };
-
-            _signalRBroadcaster.BroadcastMessage(signalRMessage);
         }
 
-     
+
         protected void BroadcastResourceChange(ModelAction action)
         {
-            var signalRMessage = new SignalRMessage
-            {
-                Name = Resource,
-                Body = new ResourceChangeMessage<TResource>(action)
-            };
-
-            _signalRBroadcaster.BroadcastMessage(signalRMessage);
         }
     }
 }

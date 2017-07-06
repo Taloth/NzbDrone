@@ -8,7 +8,6 @@ using NzbDrone.Core.Download;
 using NzbDrone.Core.MediaFiles.Events;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Tv;
-using NzbDrone.SignalR;
 
 namespace NzbDrone.Api.Episodes
 {
@@ -22,9 +21,8 @@ namespace NzbDrone.Api.Episodes
 
         protected EpisodeModuleWithSignalR(IEpisodeService episodeService,
                                            ISeriesService seriesService,
-                                           IQualityUpgradableSpecification qualityUpgradableSpecification,
-                                           IBroadcastSignalRMessage signalRBroadcaster)
-            : base(signalRBroadcaster)
+                                           IQualityUpgradableSpecification qualityUpgradableSpecification)
+            : base()
         {
             _episodeService = episodeService;
             _seriesService = seriesService;
@@ -36,9 +34,8 @@ namespace NzbDrone.Api.Episodes
         protected EpisodeModuleWithSignalR(IEpisodeService episodeService,
                                            ISeriesService seriesService,
                                            IQualityUpgradableSpecification qualityUpgradableSpecification,
-                                           IBroadcastSignalRMessage signalRBroadcaster,
                                            string resource)
-            : base(signalRBroadcaster, resource)
+            : base(resource)
         {
             _episodeService = episodeService;
             _seriesService = seriesService;
@@ -89,7 +86,7 @@ namespace NzbDrone.Api.Episodes
 
                     var series = episode.Series ?? seriesDict.GetValueOrDefault(episodes[i].SeriesId) ?? _seriesService.GetSeries(episodes[i].SeriesId);
                     seriesDict[series.Id] = series;
-                    
+
                     if (includeSeries)
                     {
                         resource.Series = series.ToResource();

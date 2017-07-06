@@ -14,15 +14,14 @@ using NzbDrone.Core.Tv.Events;
 using NzbDrone.Core.Validation.Paths;
 using NzbDrone.Core.DataAugmentation.Scene;
 using NzbDrone.Core.Validation;
-using NzbDrone.SignalR;
 
 namespace NzbDrone.Api.Series
 {
-    public class SeriesModule : NzbDroneRestModuleWithSignalR<SeriesResource, Core.Tv.Series>, 
-                                IHandle<EpisodeImportedEvent>, 
+    public class SeriesModule : NzbDroneRestModuleWithSignalR<SeriesResource, Core.Tv.Series>,
+                                IHandle<EpisodeImportedEvent>,
                                 IHandle<EpisodeFileDeletedEvent>,
-                                IHandle<SeriesUpdatedEvent>,       
-                                IHandle<SeriesEditedEvent>,  
+                                IHandle<SeriesUpdatedEvent>,
+                                IHandle<SeriesEditedEvent>,
                                 IHandle<SeriesDeletedEvent>,
                                 IHandle<SeriesRenamedEvent>,
                                 IHandle<MediaCoversUpdatedEvent>
@@ -34,8 +33,7 @@ namespace NzbDrone.Api.Series
         private readonly ISceneMappingService _sceneMappingService;
         private readonly IMapCoversToLocal _coverMapper;
 
-        public SeriesModule(IBroadcastSignalRMessage signalRBroadcaster,
-                            ISeriesService seriesService,
+        public SeriesModule(ISeriesService seriesService,
                             IAddSeriesService addSeriesService,
                             ISeriesStatisticsService seriesStatisticsService,
                             ISceneMappingService sceneMappingService,
@@ -47,7 +45,7 @@ namespace NzbDrone.Api.Series
                             SeriesAncestorValidator seriesAncestorValidator,
                             ProfileExistsValidator profileExistsValidator
             )
-            : base(signalRBroadcaster)
+            : base()
         {
             _seriesService = seriesService;
             _addSeriesService = addSeriesService;

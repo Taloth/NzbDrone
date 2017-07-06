@@ -116,7 +116,6 @@
     <Compile Include="Owin\MiddleWare\IOwinMiddleWare.cs" />
     <Compile Include="Owin\MiddleWare\NancyMiddleWare.cs" />
     <Compile Include="Owin\MiddleWare\NzbDroneVersionMiddleWare.cs" />
-    <Compile Include="Owin\MiddleWare\SignalRMiddleWare.cs" />
     <Compile Include="Owin\NlogTextWriter.cs" />
     <Compile Include="Owin\OwinHostController.cs" />
     <Compile Include="Owin\OwinServiceProvider.cs" />
@@ -159,14 +158,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.AspNet.SignalR.Core\Microsoft.AspNet.SignalR.Core.csproj">
-      <Project>{1B9A82C4-BCA1-4834-A33E-226F17BE070B}</Project>
-      <Name>Microsoft.AspNet.SignalR.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.AspNet.SignalR.Owin\Microsoft.AspNet.SignalR.Owin.csproj">
-      <Project>{2B8C6DAD-4D85-41B1-83FD-248D9F347522}</Project>
-      <Name>Microsoft.AspNet.SignalR.Owin</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NzbDrone.Api\NzbDrone.Api.csproj">
       <Project>{FD286DF8-2D3A-4394-8AD5-443FADE55FB2}</Project>
       <Name>NzbDrone.Api</Name>
@@ -178,10 +169,6 @@
     <ProjectReference Include="..\NzbDrone.Core\NzbDrone.Core.csproj">
       <Project>{FF5EE3B6-913B-47CE-9CEB-11C51B4E1205}</Project>
       <Name>NzbDrone.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NzbDrone.SignalR\NzbDrone.SignalR.csproj">
-      <Project>{7C2CC69F-5CA0-4E5C-85CB-983F9F6C3B36}</Project>
-      <Name>NzbDrone.SignalR</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

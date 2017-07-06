@@ -2,7 +2,6 @@
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Tv;
-using NzbDrone.SignalR;
 
 namespace NzbDrone.Api.Wanted
 {
@@ -10,9 +9,8 @@ namespace NzbDrone.Api.Wanted
     {
         public MissingModule(IEpisodeService episodeService,
                              ISeriesService seriesService,
-                             IQualityUpgradableSpecification qualityUpgradableSpecification,
-                             IBroadcastSignalRMessage signalRBroadcaster)
-            : base(episodeService, seriesService, qualityUpgradableSpecification, signalRBroadcaster, "wanted/missing")
+                             IQualityUpgradableSpecification qualityUpgradableSpecification)
+            : base(episodeService, seriesService, qualityUpgradableSpecification, "wanted/missing")
         {
             GetResourcePaged = GetMissingEpisodes;
         }

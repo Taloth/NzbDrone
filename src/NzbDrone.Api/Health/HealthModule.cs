@@ -2,7 +2,6 @@
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.HealthCheck;
 using NzbDrone.Core.Messaging.Events;
-using NzbDrone.SignalR;
 
 namespace NzbDrone.Api.Health
 {
@@ -11,8 +10,8 @@ namespace NzbDrone.Api.Health
     {
         private readonly IHealthCheckService _healthCheckService;
 
-        public HealthModule(IBroadcastSignalRMessage signalRBroadcaster, IHealthCheckService healthCheckService)
-            : base(signalRBroadcaster)
+        public HealthModule(IHealthCheckService healthCheckService)
+            : base()
         {
             _healthCheckService = healthCheckService;
             GetResourceAll = GetHealth;

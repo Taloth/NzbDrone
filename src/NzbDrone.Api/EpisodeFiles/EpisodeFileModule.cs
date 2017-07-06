@@ -6,7 +6,6 @@ using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Tv;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Exceptions;
-using NzbDrone.SignalR;
 using HttpStatusCode = System.Net.HttpStatusCode;
 
 namespace NzbDrone.Api.EpisodeFiles
@@ -19,12 +18,11 @@ namespace NzbDrone.Api.EpisodeFiles
         private readonly ISeriesService _seriesService;
         private readonly IQualityUpgradableSpecification _qualityUpgradableSpecification;
 
-        public EpisodeFileModule(IBroadcastSignalRMessage signalRBroadcaster,
-                             IMediaFileService mediaFileService,
+        public EpisodeFileModule(IMediaFileService mediaFileService,
                              IDeleteMediaFiles mediaFileDeletionService,
                              ISeriesService seriesService,
                              IQualityUpgradableSpecification qualityUpgradableSpecification)
-            : base(signalRBroadcaster)
+            : base()
         {
             _mediaFileService = mediaFileService;
             _mediaFileDeletionService = mediaFileDeletionService;

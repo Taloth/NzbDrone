@@ -8,7 +8,6 @@ using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.ProgressMessaging;
-using NzbDrone.SignalR;
 
 
 namespace NzbDrone.Api.Commands
@@ -19,9 +18,8 @@ namespace NzbDrone.Api.Commands
         private readonly IServiceFactory _serviceFactory;
 
         public CommandModule(IManageCommandQueue commandQueueManager,
-                             IBroadcastSignalRMessage signalRBroadcaster,
                              IServiceFactory serviceFactory)
-            : base(signalRBroadcaster)
+            : base()
         {
             _commandQueueManager = commandQueueManager;
             _serviceFactory = serviceFactory;

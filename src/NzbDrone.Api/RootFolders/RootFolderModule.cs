@@ -2,7 +2,6 @@
 using FluentValidation;
 using NzbDrone.Core.RootFolders;
 using NzbDrone.Core.Validation.Paths;
-using NzbDrone.SignalR;
 
 namespace NzbDrone.Api.RootFolders
 {
@@ -11,14 +10,13 @@ namespace NzbDrone.Api.RootFolders
         private readonly IRootFolderService _rootFolderService;
 
         public RootFolderModule(IRootFolderService rootFolderService,
-                                IBroadcastSignalRMessage signalRBroadcaster,
                                 RootFolderValidator rootFolderValidator,
                                 PathExistsValidator pathExistsValidator,
                                 DroneFactoryValidator droneFactoryValidator,
                                 MappedNetworkDriveValidator mappedNetworkDriveValidator,
                                 StartupFolderValidator startupFolderValidator,
                                 FolderWritableValidator folderWritableValidator)
-            : base(signalRBroadcaster)
+            : base()
         {
             _rootFolderService = rootFolderService;
 

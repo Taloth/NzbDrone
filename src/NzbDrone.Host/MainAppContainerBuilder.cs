@@ -4,7 +4,6 @@ using NzbDrone.Api;
 using NzbDrone.Common.Composition;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Http.Dispatchers;
-using NzbDrone.SignalR;
 
 namespace NzbDrone.Host
 {
@@ -16,8 +15,7 @@ namespace NzbDrone.Host
                              {
                                  "NzbDrone.Host",
                                  "NzbDrone.Core",
-                                 "NzbDrone.Api",
-                                 "NzbDrone.SignalR"
+                                 "NzbDrone.Api"
                              };
 
             return new MainAppContainerBuilder(args, assemblies).Container;
@@ -26,8 +24,6 @@ namespace NzbDrone.Host
         private MainAppContainerBuilder(StartupContext args, List<string> assemblies)
             : base(args, assemblies)
         {
-            AutoRegisterImplementations<NzbDronePersistentConnection>();
-
             Container.Register<INancyBootstrapper, NancyBootstrapper>();
             Container.Register<IHttpDispatcher, FallbackHttpDispatcher>();
         }
