@@ -8,8 +8,6 @@ testPackageFolder='./_tests/'
 testSearchPattern='*.Test/bin/x86/Release'
 sourceFolder='./src'
 slnFile=$sourceFolder/NzbDrone.sln
-updateFolder=$outputFolder/NzbDrone.Update
-updateFolderMono=$outputFolderMono/NzbDrone.Update
 
 nuget='tools/nuget/nuget.exe';
 CheckExitCode()
@@ -58,7 +56,6 @@ AddJsonNet()
 {
     rm $outputFolder/Newtonsoft.Json.*
     cp $sourceFolder/packages/Newtonsoft.Json.*/lib/net35/*.dll $outputFolder
-    cp $sourceFolder/packages/Newtonsoft.Json.*/lib/net35/*.dll $outputFolder/NzbDrone.Update
 }
 
 BuildWithMSBuild()
@@ -162,9 +159,6 @@ PackageMono()
     echo "Removing NzbDrone.Windows"
     rm $outputFolderMono/NzbDrone.Windows.*
 
-    echo "Adding NzbDrone.Mono to UpdatePackage"
-    cp $outputFolderMono/NzbDrone.Mono.* $updateFolderMono
-
     echo "##teamcity[progressFinish 'Creating Mono Package']"
 }
 
@@ -239,9 +233,6 @@ CleanupWindowsPackage()
 {
     echo "Removing NzbDrone.Mono"
     rm -f $outputFolder/NzbDrone.Mono.*
-
-    echo "Adding NzbDrone.Windows to UpdatePackage"
-    cp $outputFolder/NzbDrone.Windows.* $updateFolder
 }
 
 # Use mono or .net depending on OS
