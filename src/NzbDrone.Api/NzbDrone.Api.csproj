@@ -89,7 +89,6 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Authentication\AuthenticationService.cs" />
-    <Compile Include="Authentication\EnableAuthInNancy.cs" />
     <Compile Include="Authentication\AuthenticationModule.cs" />
     <Compile Include="Authentication\LoginResource.cs" />
     <Compile Include="Authentication\NzbDroneUser.cs" />
@@ -112,6 +111,7 @@
     <Compile Include="Frontend\Mappers\RobotsTxtMapper.cs" />
     <Compile Include="Indexers\ReleaseModuleBase.cs" />
     <Compile Include="Indexers\ReleasePushModule.cs" />
+    <Compile Include="NzbDroneTestModule.cs" />
     <Compile Include="Parse\ParseModule.cs" />
     <Compile Include="Parse\ParseResource.cs" />
     <Compile Include="ManualImport\ManualImportModule.cs" />
