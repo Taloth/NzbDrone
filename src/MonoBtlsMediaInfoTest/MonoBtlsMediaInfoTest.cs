@@ -15,24 +15,29 @@ namespace MonoBtlsMediaInfoTest
         [DllImport(MediaInfoLib)]
         private static extern void MediaInfo_Delete(IntPtr handle);
 
+        public static void LoadMediaInfo()
+        {
+            Console.WriteLine("Loading MediaInfo");
+            IntPtr ptr = MediaInfo_New();
+
+            if (ptr != IntPtr.Zero)
+            {
+                Console.WriteLine("Loaded MediaInfo, disposing.");
+                MediaInfo_Delete(ptr);
+            }
+            else
+            {
+                Console.WriteLine("Failed to load MediaInfo");
+            }
+        }
+
         public static void Main(string[] args)
         {
             try
             {
                 if (!args.Contains("--nomediainfo"))
                 {
-                    Console.WriteLine("Loading MediaInfo");
-                    IntPtr ptr = MediaInfo_New();
-
-                    if (ptr != IntPtr.Zero)
-                    {
-                        Console.WriteLine("Loaded MediaInfo, disposing.");
-                        MediaInfo_Delete(ptr);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Failed to load MediaInfo");
-                    }
+                    LoadMediaInfo();
                 }
 
                 var url = @"https://sonarr.tv";
