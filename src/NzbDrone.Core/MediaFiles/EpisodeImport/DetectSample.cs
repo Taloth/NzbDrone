@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using NLog;
+using NzbDrone.Core.MediaFiles.MediaInfo;
 using NzbDrone.Core.Tv;
 
 namespace NzbDrone.Core.MediaFiles.EpisodeImport
@@ -12,10 +13,12 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
 
     public class DetectSample : IDetectSample
     {
+        private readonly IVideoFileInfoReader _videoFileInfoReader;
         private readonly Logger _logger;
 
-        public DetectSample(Logger logger)
+        public DetectSample(IVideoFileInfoReader videoFileInfoReader, Logger logger)
         {
+            _videoFileInfoReader = videoFileInfoReader;
             _logger = logger;
         }
 
@@ -39,6 +42,28 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
             {
                 _logger.Debug("Skipping sample check for .strm file");
                 return DetectSampleResult.NotSample;
+            }
+
+            var runTime = _videoFileInfoReader.GetRunTime(path);
+
+            if (!runTime.HasValue)
+            {
+                _logger.Error("Failed to get runtime from the file, make sure mediainfo is available");
+                return DetectSampleResult.Indeterminate;
+            }
+
+            var minimumRuntime = GetMinimumAllowedRuntime(series);
+
+            if (runTime.Value.TotalMinutes.Equals(0))
+            {
+                _logger.Error("[{0}] has a runtime of 0, is it a valid video file?", path);
+                return DetectSampleResult.Sample;
+            }
+
+            if (runTime.Value.TotalSeconds < minimumRuntime)
+            {
+                _logger.Debug("[{0}] appears to be a sample. Runtime: {1} seconds. Expected at least: {2} seconds", path, runTime, minimumRuntime);
+                return DetectSampleResult.Sample;
             }
 
             _logger.Debug("Runtime is over 90 seconds");

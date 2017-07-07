@@ -9,6 +9,7 @@ using NzbDrone.Common.Instrumentation.Extensions;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Download;
 using NzbDrone.Core.Download.TrackedDownloads;
+using NzbDrone.Core.MediaFiles.MediaInfo;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Parser;
@@ -30,6 +31,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
         private readonly IMakeImportDecision _importDecisionMaker;
         private readonly ISeriesService _seriesService;
         private readonly IEpisodeService _episodeService;
+        private readonly IVideoFileInfoReader _videoFileInfoReader;
         private readonly IImportApprovedEpisodes _importApprovedEpisodes;
         private readonly ITrackedDownloadService _trackedDownloadService;
         private readonly IDownloadedEpisodesImportService _downloadedEpisodesImportService;
@@ -42,6 +44,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
                                    IMakeImportDecision importDecisionMaker,
                                    ISeriesService seriesService,
                                    IEpisodeService episodeService,
+                                   IVideoFileInfoReader videoFileInfoReader,
                                    IImportApprovedEpisodes importApprovedEpisodes,
                                    ITrackedDownloadService trackedDownloadService,
                                    IDownloadedEpisodesImportService downloadedEpisodesImportService,
@@ -54,6 +57,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
             _importDecisionMaker = importDecisionMaker;
             _seriesService = seriesService;
             _episodeService = episodeService;
+            _videoFileInfoReader = videoFileInfoReader;
             _importApprovedEpisodes = importApprovedEpisodes;
             _trackedDownloadService = trackedDownloadService;
             _downloadedEpisodesImportService = downloadedEpisodesImportService;
@@ -219,12 +223,14 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
                 var series = _seriesService.GetSeries(file.SeriesId);
                 var episodes = _episodeService.GetEpisodes(file.EpisodeIds);
                 var parsedEpisodeInfo = Parser.Parser.ParsePath(file.Path) ?? new ParsedEpisodeInfo();
+                var mediaInfo = _videoFileInfoReader.GetMediaInfo(file.Path);
                 var existingFile = series.Path.IsParentPath(file.Path);
 
                 var localEpisode = new LocalEpisode
                 {
                     ExistingFile = false,
                     Episodes = episodes,
+                    MediaInfo = mediaInfo,
                     ParsedEpisodeInfo = parsedEpisodeInfo,
                     Path = file.Path,
                     Quality = file.Quality,

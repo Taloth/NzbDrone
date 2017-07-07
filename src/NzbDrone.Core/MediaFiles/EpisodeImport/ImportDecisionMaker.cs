@@ -11,6 +11,7 @@ using NzbDrone.Core.Parser;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Tv;
+using NzbDrone.Core.MediaFiles.MediaInfo;
 
 
 namespace NzbDrone.Core.MediaFiles.EpisodeImport
@@ -27,6 +28,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
         private readonly IParsingService _parsingService;
         private readonly IMediaFileService _mediaFileService;
         private readonly IDiskProvider _diskProvider;
+        private readonly IVideoFileInfoReader _videoFileInfoReader;
         private readonly IDetectSample _detectSample;
         private readonly Logger _logger;
 
@@ -34,6 +36,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
                                    IParsingService parsingService,
                                    IMediaFileService mediaFileService,
                                    IDiskProvider diskProvider,
+                                   IVideoFileInfoReader videoFileInfoReader,
                                    IDetectSample detectSample,
                                    Logger logger)
         {
@@ -41,6 +44,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
             _parsingService = parsingService;
             _mediaFileService = mediaFileService;
             _diskProvider = diskProvider;
+            _videoFileInfoReader = videoFileInfoReader;
             _detectSample = detectSample;
             _logger = logger;
         }
@@ -85,6 +89,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport
                     //TODO: make it so media info doesn't ruin the import process of a new series
                     if (sceneSource)
                     {
+                        localEpisode.MediaInfo = _videoFileInfoReader.GetMediaInfo(file);
                     }
 
                     if (localEpisode.Episodes.Empty())
