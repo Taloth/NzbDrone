@@ -5,7 +5,6 @@ using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Lifecycle;
 using NzbDrone.Core.Messaging.Events;
-using NzbDrone.Host.Owin;
 
 namespace NzbDrone.Host
 {
@@ -19,23 +18,23 @@ namespace NzbDrone.Host
     {
         private readonly IConfigFileProvider _configFileProvider;
         private readonly IRuntimeInfo _runtimeInfo;
-        private readonly IHostController _hostController;
         private readonly IStartupContext _startupContext;
         private readonly IBrowserService _browserService;
+        private readonly IEventAggregator _eventAggregator;
         private readonly Logger _logger;
 
         public NzbDroneServiceFactory(IConfigFileProvider configFileProvider,
-                                      IHostController hostController,
                                       IRuntimeInfo runtimeInfo,
                                       IStartupContext startupContext,
                                       IBrowserService browserService,
+                                      IEventAggregator eventAggregator,
                                       Logger logger)
         {
             _configFileProvider = configFileProvider;
-            _hostController = hostController;
             _runtimeInfo = runtimeInfo;
             _startupContext = startupContext;
             _browserService = browserService;
+            _eventAggregator = eventAggregator;
             _logger = logger;
         }
 
@@ -52,7 +51,8 @@ namespace NzbDrone.Host
             }
 
             _runtimeInfo.IsExiting = false;
-            _hostController.StartServer();
+
+            _eventAggregator.PublishEvent(new ApplicationStartedEvent());
 
             if (!_startupContext.Flags.Contains(StartupContext.NO_BROWSER)
                 && _configFileProvider.LaunchBrowser)
@@ -74,7 +74,6 @@ namespace NzbDrone.Host
         private void Shutdown()
         {
             _logger.Info("Attempting to stop application.");
-            _hostController.StopServer();
             _logger.Info("Application has finished stop routine.");
             _runtimeInfo.IsExiting = true;
         }
