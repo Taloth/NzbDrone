@@ -4,11 +4,11 @@ using NzbDrone.Common.Http;
 
 namespace NzbDrone.Api
 {
-    public  class NzbDroneTestModule : NancyModule
+    public class NzbDroneTestModule : NancyModule
     {
         private readonly IHttpClient _httpClient;
 
-        protected NzbDroneTestModule(IHttpClient httpClient)
+        public NzbDroneTestModule(IHttpClient httpClient)
             : base("/test")
         {
             _httpClient = httpClient;
