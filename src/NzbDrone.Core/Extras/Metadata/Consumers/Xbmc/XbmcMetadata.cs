@@ -11,7 +11,6 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Extras.Metadata.Files;
 using NzbDrone.Core.MediaCover;
 using NzbDrone.Core.MediaFiles;
-using NzbDrone.Core.MediaFiles.MediaInfo;
 using NzbDrone.Core.Tv;
 
 namespace NzbDrone.Core.Extras.Metadata.Consumers.Xbmc
@@ -244,37 +243,6 @@ namespace NzbDrone.Core.Extras.Metadata.Consumers.Xbmc
                     {
                         var fileInfo = new XElement("fileinfo");
                         var streamDetails = new XElement("streamdetails");
-
-                        var video = new XElement("video");
-                        video.Add(new XElement("aspect", (float)episodeFile.MediaInfo.Width / (float)episodeFile.MediaInfo.Height));
-                        video.Add(new XElement("bitrate", episodeFile.MediaInfo.VideoBitrate));
-                        video.Add(new XElement("codec", MediaInfoFormatter.FormatVideoCodec(episodeFile.MediaInfo, episodeFile.SceneName)));
-                        video.Add(new XElement("framerate", episodeFile.MediaInfo.VideoFps));
-                        video.Add(new XElement("height", episodeFile.MediaInfo.Height));
-                        video.Add(new XElement("scantype", episodeFile.MediaInfo.ScanType));
-                        video.Add(new XElement("width", episodeFile.MediaInfo.Width));
-
-                        if (episodeFile.MediaInfo.RunTime != null)
-                        {
-                            video.Add(new XElement("duration", episodeFile.MediaInfo.RunTime.TotalMinutes));
-                            video.Add(new XElement("durationinseconds", episodeFile.MediaInfo.RunTime.TotalSeconds));
-                        }
-
-                        streamDetails.Add(video);
-
-                        var audio = new XElement("audio");
-                        audio.Add(new XElement("bitrate", episodeFile.MediaInfo.AudioBitrate));
-                        audio.Add(new XElement("channels", episodeFile.MediaInfo.AudioChannels));
-                        audio.Add(new XElement("codec", MediaInfoFormatter.FormatAudioCodec(episodeFile.MediaInfo)));
-                        audio.Add(new XElement("language", episodeFile.MediaInfo.AudioLanguages));
-                        streamDetails.Add(audio);
-
-                        if (episodeFile.MediaInfo.Subtitles.IsNotNullOrWhiteSpace())
-                        {
-                            var subtitle = new XElement("subtitle");
-                            subtitle.Add(new XElement("language", episodeFile.MediaInfo.Subtitles));
-                            streamDetails.Add(subtitle);
-                        }
 
                         fileInfo.Add(streamDetails);
                         details.Add(fileInfo);

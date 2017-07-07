@@ -802,11 +802,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MediaFiles\MediaFileTableCleanupService.cs" />
-    <Compile Include="MediaFiles\MediaInfo\MediaInfoFormatter.cs" />
-    <Compile Include="MediaFiles\MediaInfo\MediaInfoLib.cs" />
-    <Compile Include="MediaFiles\MediaInfo\MediaInfoModel.cs" />
-    <Compile Include="MediaFiles\MediaInfo\UpdateMediaInfoService.cs" />
-    <Compile Include="MediaFiles\MediaInfo\VideoFileInfoReader.cs" />
     <Compile Include="MediaFiles\RecycleBinProvider.cs" />
     <Compile Include="MediaFiles\RenameEpisodeFilePreview.cs" />
     <Compile Include="MediaFiles\RenameEpisodeFileService.cs" />

@@ -9,7 +9,6 @@ using NzbDrone.Common.Cache;
 using NzbDrone.Common.EnsureThat;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.MediaFiles;
-using NzbDrone.Core.MediaFiles.MediaInfo;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Tv;
 
@@ -131,7 +130,7 @@ namespace NzbDrone.Core.Organizer
             AddEpisodeFileTokens(tokenHandlers, episodeFile);
             AddQualityTokens(tokenHandlers, series, episodeFile);
             AddMediaInfoTokens(tokenHandlers, episodeFile);
-            
+
             var fileName = ReplaceTokens(pattern, tokenHandlers, namingConfig).Trim();
             fileName = FileNameCleanupRegex.Replace(fileName, match => match.Captures[0].Value[0].ToString());
             fileName = TrimSeparatorsRegex.Replace(fileName, string.Empty);
@@ -454,43 +453,6 @@ namespace NzbDrone.Core.Organizer
         {
             if (episodeFile.MediaInfo == null) return;
 
-            var videoCodec =  MediaInfoFormatter.FormatVideoCodec(episodeFile.MediaInfo, episodeFile.SceneName);
-            var audioCodec =  MediaInfoFormatter.FormatAudioCodec(episodeFile.MediaInfo);
-            var audioChannels = MediaInfoFormatter.FormatAudioChannels(episodeFile.MediaInfo);
-
-            var mediaInfoAudioLanguages = GetLanguagesToken(episodeFile.MediaInfo.AudioLanguages);
-            if (!mediaInfoAudioLanguages.IsNullOrWhiteSpace())
-            {
-                mediaInfoAudioLanguages = $"[{mediaInfoAudioLanguages}]";
-            }
-
-            if (mediaInfoAudioLanguages == "[EN]")
-            {
-                mediaInfoAudioLanguages = string.Empty;
-            }
-
-            var mediaInfoSubtitleLanguages = GetLanguagesToken(episodeFile.MediaInfo.Subtitles);
-            if (!mediaInfoSubtitleLanguages.IsNullOrWhiteSpace())
-            {
-                mediaInfoSubtitleLanguages = $"[{mediaInfoSubtitleLanguages}]";
-            }
-
-            var videoBitDepth = episodeFile.MediaInfo.VideoBitDepth > 0 ? episodeFile.MediaInfo.VideoBitDepth.ToString() : string.Empty;
-            var audioChannelsFormatted = audioChannels > 0 ?
-                                audioChannels.ToString("F1", CultureInfo.InvariantCulture) :
-                                string.Empty;
-
-            tokenHandlers["{MediaInfo Video}"] = m => videoCodec;
-            tokenHandlers["{MediaInfo VideoCodec}"] = m => videoCodec;
-            tokenHandlers["{MediaInfo VideoBitDepth}"] = m => videoBitDepth;
-
-            tokenHandlers["{MediaInfo Audio}"] = m => audioCodec;
-            tokenHandlers["{MediaInfo AudioCodec}"] = m => audioCodec;
-            tokenHandlers["{MediaInfo AudioChannels}"] = m => audioChannelsFormatted;
-
-            tokenHandlers["{MediaInfo Simple}"] = m => $"{videoCodec} {audioCodec}";
-
-            tokenHandlers["{MediaInfo Full}"] = m => $"{videoCodec} {audioCodec}{mediaInfoAudioLanguages} {mediaInfoSubtitleLanguages}";
         }
 
         private string GetLanguagesToken(string mediaInfoLanguages)

@@ -4,7 +4,6 @@ using Marr.Data;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Tv;
-using NzbDrone.Core.MediaFiles.MediaInfo;
 
 namespace NzbDrone.Core.MediaFiles
 {
@@ -19,7 +18,7 @@ namespace NzbDrone.Core.MediaFiles
         public string SceneName { get; set; }
         public string ReleaseGroup { get; set; }
         public QualityModel Quality { get; set; }
-        public MediaInfoModel MediaInfo { get; set; }
+        public Dictionary<string, object> MediaInfo { get; set; }
         public LazyLoaded<List<Episode>> Episodes { get; set; }
         public LazyLoaded<Series> Series { get; set; }
 

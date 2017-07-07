@@ -2,7 +2,6 @@
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Tv;
-using NzbDrone.Core.MediaFiles.MediaInfo;
 
 namespace NzbDrone.Core.Organizer
 {
@@ -84,27 +83,9 @@ namespace NzbDrone.Core.Organizer
             _singleEpisode = new List<Episode> { _episode1 };
             _multiEpisodes = new List<Episode> { _episode1, _episode2, _episode3 };
 
-            var mediaInfo = new MediaInfoModel()
-            {
-                VideoCodec = "AVC",
-                VideoBitDepth = 8,
-                AudioFormat = "DTS",
-                AudioChannels = 6,
-                AudioChannelPositions = "3/2/0.1",
-                AudioLanguages = "English",
-                Subtitles = "English/German"
-            };
+            var mediaInfo = new  Dictionary<string, object>();
 
-            var mediaInfoAnime = new MediaInfoModel()
-            {
-                VideoCodec = "AVC",
-                VideoBitDepth = 8,
-                AudioFormat = "DTS",
-                AudioChannels = 6,
-                AudioChannelPositions = "3/2/0.1",
-                AudioLanguages = "Japanese",
-                Subtitles = "Japanese/English"
-            };
+            var mediaInfoAnime = new Dictionary<string, object>();
 
             _singleEpisodeFile = new EpisodeFile
             {
