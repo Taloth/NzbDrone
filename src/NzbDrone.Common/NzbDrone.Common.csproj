@@ -181,12 +181,6 @@
     <Compile Include="Instrumentation\LogEventExtensions.cs" />
     <Compile Include="Instrumentation\NzbDroneFileTarget.cs" />
     <Compile Include="Instrumentation\NzbDroneLogger.cs" />
-    <Compile Include="Instrumentation\Sentry\SentryDebounce.cs" />
-    <Compile Include="Instrumentation\Sentry\SentryPacketCleanser.cs" />
-    <Compile Include="Instrumentation\Sentry\SentryTarget.cs" />
-    <Compile Include="Instrumentation\Sentry\MachineNameUserFactory.cs" />
-    <Compile Include="Instrumentation\Sentry\SonarrJsonPacketFactory.cs" />
-    <Compile Include="Instrumentation\Sentry\SonarrSentryPacket.cs" />
     <Compile Include="Instrumentation\VersionLayoutRenderer.cs" />
     <Compile Include="Extensions\LevenstheinExtensions.cs" />
     <Compile Include="Messaging\IEvent.cs" />
